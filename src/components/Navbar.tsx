@@ -1,12 +1,9 @@
 /* eslint-disable react/jsx-indent, @typescript-eslint/indent */
-
 'use client';
-
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { BoxArrowRight, Lock, PersonFill, PersonPlusFill } from 'react-bootstrap-icons';
-
 const NavBar: React.FC = () => {
   const { data: session } = useSession();
   const currentUser = session?.user?.email;
@@ -27,6 +24,9 @@ const NavBar: React.FC = () => {
                   </Nav.Link>,
                   <Nav.Link id="list-stuff-nav" href="/list" key="list" active={pathName === '/list'}>
                     List Stuff
+                  </Nav.Link>,
+                  <Nav.Link id="user-search-nav" href="/user-search" key="user-search" active={pathName === '/user-search'}>
+                    User Search
                   </Nav.Link>,
                 ]
               : ''}
@@ -68,5 +68,4 @@ const NavBar: React.FC = () => {
     </Navbar>
   );
 };
-
 export default NavBar;

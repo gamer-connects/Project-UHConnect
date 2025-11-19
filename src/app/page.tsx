@@ -1,17 +1,19 @@
-import { Col, Container, Image, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 
 /** The Home page. */
 const Home = () => (
   <main>
-    <Container id="landing-page" fluid className="py-3">
-      <Row className="align-middle text-center">
-        <Col xs={4}>
-          <Image src="next.svg" width="150px" alt="" />
+    <Container id="landing-page" fluid className="py-5">
+      <Row className="text-center mb-5">
+        <Col>
+          <h1>UH Connect</h1>
+          <p className="lead">This is a placeholder landing page.</p>
         </Col>
+      </Row>
 
-        <Col xs={8} className="d-flex flex-column justify-content-center">
-          <h1>Welcome to this template</h1>
-          <p>Now get to work and modify this app!</p>
+      <Row className="text-center">
+        <Col>
+          <p>Replace this content with your actual landing page.</p>
         </Col>
       </Row>
     </Container>
