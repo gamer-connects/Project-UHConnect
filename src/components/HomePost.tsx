@@ -26,10 +26,7 @@ const HomePost = ({ post }: HomePostProps) => (
 
       <div>
         <Card.Title className="m-0">{post.username}</Card.Title>
-        <Card.Subtitle className="text-muted">
-          @
-          {post.username}
-        </Card.Subtitle>
+
       </div>
     </Card.Header>
 
