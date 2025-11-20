@@ -31,10 +31,10 @@ const NavBar: React.FC = () => {
                     List Stuff
                   </Nav.Link>,
                   <Nav.Link
-                    id="user-search-nav"
-                    href="/user-search"
-                    key="user-search"
-                    active={pathName === '/user-search'}
+                    id="usersearch-nav"
+                    href="/usersearch"
+                    key="usersearch"
+                    active={pathName === '/usersearch'}
                   >
                     User Search
                   </Nav.Link>,
