@@ -148,10 +148,11 @@ const SignUpPage: React.FC = () => {
                         className="w-100"
                         onClick={() => reset()}
                         style={{
-                          backgroundColor: '#2d2d2d',
-                          border: '1px solid #76b900',
-                          color: '#76b900',
-                          fontWeight: 600,
+                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                          border: 'none',
+                          fontWeight: 700,
+                          color: '#0d0d0d',
+                          boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
                         }}
                       >
                         Reset
