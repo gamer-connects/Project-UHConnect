@@ -22,7 +22,7 @@ const games = [
   { name: 'Genshin Impact', cover: '/covers/genshin.jpg' },
   { name: 'Rocket League', cover: '/covers/rocketleague.jpg' },
   { name: 'Dota 2', cover: '/covers/dota2.jpg' },
-] as const; // ← fixes "const assertions" warning if you have it
+] as const;
 
 export default function UserSearch() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,8 +34,8 @@ export default function UserSearch() {
 
   return (
     <div className="user-search-landing">
-      <Container fluid className="h-100 py-5">
-        <Row className="h-100">
+      <Container fluid className="py-5">
+        <Row>
           {/* ─────── LEFT SIDEBAR ─────── */}
           <Col lg={5} xl={4} className="left-sidebar pe-lg-4">
             {/* Hero */}
@@ -53,7 +53,6 @@ export default function UserSearch() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="border-0 py-3 shadow-none"
-                  style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}
                 />
                 <Button variant="success">Search</Button>
               </InputGroup>
@@ -90,7 +89,7 @@ export default function UserSearch() {
               </h2>
 
               <div className="placeholder-glow">
-                <p className="lead text-center text-white-50 mt-5">
+                <p className="lead text-center mt-5">
                   {selectedGame || searchQuery
                     ? 'Results will appear here instantly...'
                     : 'Start typing or select a game to see players'}
