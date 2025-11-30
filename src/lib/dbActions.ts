@@ -68,12 +68,42 @@ export async function deleteStuff(id: number) {
  * @param credentials, an object with the following properties: email, password.
  */
 export async function createUser(credentials: { email: string; password: string }) {
-  // console.log(`createUser data: ${JSON.stringify(credentials, null, 2)}`);
+  // console.log`createUser data: ${JSON.stringify(credentials, null, 2)}`);
+
+  // Check if user already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email: credentials.email },
+  });
+
+  if (existingUser) {
+    throw new Error('User with this email already exists');
+  }
+
+  // Generate username from email (before @)
+  const baseUsername = credentials.email.split('@')[0];
+
+  // Check if username exists, if so, add a number
+  let username = baseUsername;
+  let counter = 1;
+  while (await prisma.user.findUnique({ where: { username } })) {
+    username = `${baseUsername}${counter}`;
+    counter++;
+  }
+
+  // Hash password
   const password = await hash(credentials.password, 10);
+
+  // Create user with all required fields
   await prisma.user.create({
     data: {
       email: credentials.email,
       password,
+      username, // NEW - required field
+      bio: '', // NEW - default empty
+      gameInterests: [], // NEW - empty array
+      gameTags: [], // NEW - empty array
+      followers: 0, // NEW - starts at 0
+      following: 0, // NEW - starts at 0
     },
   });
 }

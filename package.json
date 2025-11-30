@@ -18,6 +18,7 @@
     "@ngneat/falso": "^7.2.0",
     "@prisma/client": "^6.19.0",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "^14.2.24",
