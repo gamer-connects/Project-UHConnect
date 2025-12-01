@@ -1,27 +1,47 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
-import { Button, Col, Row } from 'react-bootstrap';
+import {
+  Button, Col, Row, Card,
+} from 'react-bootstrap';
+import React from 'react';
 
-/** After the user clicks the "SignOut" link in the NavBar, log them out and display this page. */
-const SignOut = () => (
-  <Col id="signout-page" className="text-center py-3">
-    <h2>Do you want to sign out?</h2>
-    <Row>
-      <Col xs={4} />
-      <Col>
-        <Button variant="danger" onClick={() => signOut({ callbackUrl: '/', redirect: true })}>
-          Sign Out
-        </Button>
-      </Col>
-      <Col>
-        <Button variant="secondary" href="/">
-          Cancel
-        </Button>
-      </Col>
-      <Col xs={4} />
-    </Row>
-  </Col>
+const SignOut: React.FC = () => (
+  <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <Card className="p-4 shadow-lg border-0" style={{ maxWidth: '420px', width: '100%' }}>
+      <Card.Body className="text-center">
+        <h2 className="fw-bold mb-3" style={{ color: '#7b2cbf' }}>Sign Out</h2>
+        <p className="text-muted mb-4">
+          Are you sure you want to sign out of
+          {' '}
+          <strong>UHConnect</strong>
+          ?
+        </p>
+
+        <Row className="gy-3">
+          <Col xs={12}>
+            <Button
+              variant="danger"
+              className="w-100 fw-bold"
+              onClick={() => signOut({ callbackUrl: '/', redirect: true })}
+            >
+              Confirm Sign Out
+            </Button>
+          </Col>
+
+          <Col xs={12}>
+            <Button
+              variant="secondary"
+              href="/"
+              className="w-100 fw-bold"
+            >
+              Cancel
+            </Button>
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
+  </div>
 );
 
 export default SignOut;
