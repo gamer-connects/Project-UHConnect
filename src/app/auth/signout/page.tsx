@@ -12,62 +12,64 @@ const SignOut: React.FC = () => (
     style={{
       height: '100vh',
       width: '100vw',
-      background: 'linear-gradient(135deg, #7b2cbf, #ab47ff, #ff89e5)',
-      backgroundSize: '300% 300%',
-      animation: 'uhcGradient 10s ease infinite',
+      background: 'linear-gradient(135deg, #8a00ff, #0066ff)',
       padding: '20px',
     }}
   >
-    <style>
-      {`
-        @keyframes uhcGradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}
-    </style>
-
     <Card
-      className="p-4 shadow-lg border-0"
+      className="p-5 shadow-lg border-0"
       style={{
-        maxWidth: '420px',
-        width: '95%',
+        maxWidth: '480px',
+        width: '100%',
         borderRadius: '20px',
-        backdropFilter: 'blur(8px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.25)',
       }}
     >
       <Card.Body className="text-center">
-        <h2 className="fw-bold mb-3" style={{ color: '#7b2cbf' }}>
+
+        {/* Title */}
+        <h2
+          className="fw-bold mb-2"
+          style={{ color: '#00aaff', fontSize: '28px' }}
+        >
           Sign Out
         </h2>
 
-        <p className="text-dark mb-4 fw-semibold">
-          Are you sure you want to sign out of
+        {/* Subtitle */}
+        <p className="text-muted mb-4" style={{ fontSize: '15px' }}>
+          You&apos;re about to leave
           {' '}
-          <span style={{ color: '#7b2cbf' }}>UHConnect</span>
-          ?
+          <strong>UHConnect</strong>
+          .
         </p>
 
-        <Row className="gy-3">
+        <p className="fw-semibold mb-4" style={{ fontSize: '16px' }}>
+          Are you sure you want to sign out?
+        </p>
+
+        {/* Buttons */}
+        <Row className="gy-3 mt-2 px-1">
           <Col xs={12}>
             <Button
-              variant="danger"
               className="w-100 fw-bold py-2"
-              style={{ borderRadius: '12px' }}
+              style={{
+                background: 'linear-gradient(to right, #00aaff, #8a00ff)',
+                border: 'none',
+                borderRadius: '10px',
+              }}
               onClick={() => signOut({ callbackUrl: '/', redirect: true })}
             >
-              Confirm Sign Out
+              Sign Out
             </Button>
           </Col>
 
           <Col xs={12}>
             <Button
               variant="secondary"
-              href="/"
               className="w-100 fw-bold py-2"
-              style={{ borderRadius: '12px' }}
+              style={{
+                borderRadius: '10px',
+              }}
+              href="/"
             >
               Cancel
             </Button>
