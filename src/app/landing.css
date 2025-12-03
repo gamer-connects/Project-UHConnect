@@ -1,9 +1,23 @@
-/* Landing Page Styles */
+/* Landing Page Styles - Gaming Theme */
 .landing-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
   min-height: 100vh;
   color: #ffffff;
   padding-bottom: 80px;
+  position: relative;
+}
+
+.landing-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(118, 185, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .hero-content h1 {
@@ -18,41 +32,44 @@
 }
 
 .cta-buttons .btn-primary {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
-  font-weight: 600;
+  background: linear-gradient(135deg, #76b900 0%, #39ff14 100%);
+  border: none;
+  color: #0d0d0d;
+  font-weight: 700;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(118, 185, 0, 0.4);
 }
 
 .cta-buttons .btn-primary:hover {
-  background-color: #45a049;
-  border-color: #45a049;
+  background: linear-gradient(135deg, #39ff14 0%, #76b900 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 25px rgba(57, 255, 20, 0.6);
 }
 
 .cta-buttons .btn-outline-primary {
-  border-color: #ffffff;
-  color: #ffffff;
-  font-weight: 600;
+  border: 2px solid #76b900;
+  color: #76b900;
+  background-color: transparent;
+  font-weight: 700;
   transition: all 0.3s ease;
 }
 
 .cta-buttons .btn-outline-primary:hover {
-  background-color: #ffffff;
-  color: #667eea;
+  background-color: #76b900;
+  color: #0d0d0d;
+  border-color: #39ff14;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(118, 185, 0, 0.4);
 }
 
 /* Feature showcase */
 .main-feature-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(26, 26, 26, 0.6);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(118, 185, 0, 0.2);
+  border: 2px solid #76b900;
 }
 
 .feature-image {
@@ -63,34 +80,37 @@
 }
 
 .small-feature-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 16px rgba(118, 185, 0, 0.2);
+  border: 1px solid #76b900;
+  transition: all 0.3s ease;
   text-align: center;
   height: 100%;
 }
 
 .small-feature-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(57, 255, 20, 0.4);
+  border-color: #39ff14;
 }
 
 .feature-icon-container {
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, #76b900 0%, #39ff14 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 15px;
+  box-shadow: 0 4px 15px rgba(118, 185, 0, 0.4);
 }
 
 .feature-icon-svg {
-  color: #ffffff;
+  color: #0d0d0d;
 }
 
 .feature-text-content {
@@ -98,15 +118,15 @@
 }
 
 .feature-title {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 5px;
-  color: #ffffff;
+  color: #76b900;
 }
 
 .feature-description {
   font-size: 0.9rem;
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: #b3b3b3;
 }
 
 /* Responsive adjustments */

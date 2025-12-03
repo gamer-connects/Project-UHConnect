@@ -40,30 +40,79 @@ export default function HomePage() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #1E90FF 0%, #8A2BE2 100%)',
+        background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
         width: '100%',
+        minHeight: '100vh',
+        position: 'relative',
       }}
     >
-      <main className="container mt-4">
-        <h1 className="mb-4 text-center text-white">Home🏠</h1>
+      {/* Background glow effects */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 30% 20%, rgba(118, 185, 0, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 70% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
+        `,
+        pointerEvents: 'none',
+      }}
+      />
+
+      <main className="container mt-4" style={{ position: 'relative', zIndex: 1 }}>
+        <h1
+          className="mb-4 text-center"
+          style={{
+            color: '#76b900',
+            fontWeight: 'bold',
+            textShadow: '0 0 20px rgba(118, 185, 0, 0.5)',
+            fontSize: '3rem',
+          }}
+        >
+          Home 🏠
+        </h1>
         <Row className="mt-3">
           <Col
             style={{
-              backgroundColor: 'rgba(108, 117, 125, 0.7)', // bg-secondary with 70% opacity
+              backgroundColor: '#1a1a1a',
+              border: '2px solid #76b900',
+              boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
             }}
             className="p-3 rounded me-3 mb-4"
           >
-            <h2 className="text-center mb-3 text-white">Browse Posts</h2>
+            <h2
+              className="text-center mb-3"
+              style={{
+                color: '#76b900',
+                fontWeight: 'bold',
+                textShadow: '0 0 10px rgba(118, 185, 0, 0.3)',
+              }}
+            >
+              Browse Posts
+            </h2>
             <HomePost post={samplePost} />
             <HomePost post={samplePost2} />
           </Col>
           <Col
             style={{
-              backgroundColor: 'rgba(108, 117, 125, 0.7)', // bg-secondary with 70% opacity
+              backgroundColor: '#1a1a1a',
+              border: '2px solid #76b900',
+              boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
             }}
             className="p-3 rounded ms-3 mb-4"
           >
-            <h2 className="text-center mb-3 text-white">Events</h2>
+            <h2
+              className="text-center mb-3"
+              style={{
+                color: '#76b900',
+                fontWeight: 'bold',
+                textShadow: '0 0 10px rgba(118, 185, 0, 0.3)',
+              }}
+            >
+              Events
+            </h2>
             <HomeEvent event={sampleEvent} />
             <HomeEvent event={sampleEvent2} />
           </Col>
