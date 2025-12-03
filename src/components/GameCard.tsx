@@ -17,8 +17,20 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
         width: '280px',
         borderRadius: '16px',
         overflow: 'hidden',
-        background: 'rgba(200, 200, 200, 0.25)', // uniform transparent gray
-        backdropFilter: 'blur(4px)', // smooth blur
+        background: '#1a1a1a',
+        border: '2px solid #76b900',
+        boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
+        transition: 'all 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-8px)';
+        e.currentTarget.style.boxShadow = '0 12px 40px rgba(118, 185, 0, 0.4)';
+        e.currentTarget.style.borderColor = '#39ff14';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 8px 32px rgba(118, 185, 0, 0.2)';
+        e.currentTarget.style.borderColor = '#76b900';
       }}
     >
       <div
@@ -26,7 +38,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
           width: '100%',
           height: '360px',
           position: 'relative',
-          background: 'transparent', // ensure uniform card background
+          background: '#0d0d0d',
         }}
       >
         <Image
@@ -39,8 +51,16 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
         />
       </div>
 
-      <Card.Body className="text-center">
-        <Card.Title className="fw-bold text-light fs-5">{title}</Card.Title>
+      <Card.Body className="text-center" style={{ backgroundColor: '#1a1a1a' }}>
+        <Card.Title
+          className="fw-bold fs-5"
+          style={{
+            color: '#76b900',
+            textShadow: '0 0 10px rgba(118, 185, 0, 0.3)',
+          }}
+        >
+          {title}
+        </Card.Title>
       </Card.Body>
     </Card>
   </Link>

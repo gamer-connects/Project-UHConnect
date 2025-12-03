@@ -21,13 +21,38 @@ export default function GamesPage() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #1E90FF 0%, #8A2BE2 100%)',
+        background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
         width: '100%',
         minHeight: '100vh',
+        position: 'relative',
       }}
     >
-      <Container className="py-5">
-        <h1 className="text-center mb-4 pb-4 fw-bold text-white">Games</h1>
+      {/* Background glow effects */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 30% 20%, rgba(118, 185, 0, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 70% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
+        `,
+        pointerEvents: 'none',
+      }}
+      />
+
+      <Container className="py-5" style={{ position: 'relative', zIndex: 1 }}>
+        <h1
+          className="text-center mb-4 pb-4 fw-bold"
+          style={{
+            color: '#76b900',
+            textShadow: '0 0 20px rgba(118, 185, 0, 0.5)',
+            fontSize: '3rem',
+          }}
+        >
+          Games
+        </h1>
 
         <Row className="g-4" xs={1} sm={2} md={3} lg={4}>
           {games.map((game) => (
