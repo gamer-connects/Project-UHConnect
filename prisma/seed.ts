@@ -7,25 +7,45 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding the database');
   const password = await hash('changeme', 10);
-  config.defaultAccounts.forEach(async (account) => {
-    const role = account.role as Role || Role.USER;
+
+  // Seed users
+  for (const account of config.defaultAccounts) {
+    const role = (account.role as Role) || Role.USER;
+
     console.log(`  Creating user: ${account.email} with role: ${role}`);
-    await prisma.user.upsert({
+
+    prisma.user.upsert({
       where: { email: account.email },
       update: {},
       create: {
         email: account.email,
         password,
         role,
+
+        // REQUIRED FIELDS
+        username: account.email.split('@')[0], // Always derived
+        updatedAt: new Date(),
+
+        // NON-NULLABLE FIELDS
+        followers: 0,
+        following: 0,
+        gameInterests: [],
+        gameTags: [],
+
+        // OPTIONAL
+        bio: null,
+        profileImage: '/profile.png',
       },
     });
-    // console.log(`  Created user: ${user.email} with role: ${user.role}`);
-  });
+  }
+
+  // Seed Stuff
   for (const data of config.defaultData) {
-    const condition = data.condition as Condition || Condition.good;
+    const condition = (data.condition as Condition) || Condition.good;
+
     console.log(`  Adding stuff: ${JSON.stringify(data)}`);
-    // eslint-disable-next-line no-await-in-loop
-    await prisma.stuff.upsert({
+
+    prisma.stuff.upsert({
       where: { id: config.defaultData.indexOf(data) + 1 },
       update: {},
       create: {
@@ -37,6 +57,7 @@ async function main() {
     });
   }
 }
+
 main()
   .then(() => prisma.$disconnect())
   .catch(async (e) => {
