@@ -5,7 +5,9 @@ import { useSession } from 'next-auth/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import swal from 'sweetalert';
-import { Card, Col, Button, Form, Row } from 'react-bootstrap';
+import {
+  Card, Col, Button, Form, Row,
+} from 'react-bootstrap';
 import { changePassword } from '@/lib/dbActions';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -34,7 +36,9 @@ const ChangePassword = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ChangePasswordForm>({ resolver: yupResolver(validationSchema) });
+  } = useForm<ChangePasswordForm>({
+    resolver: yupResolver(validationSchema),
+  });
 
   const onSubmit = async (data: ChangePasswordForm) => {
     try {
@@ -45,7 +49,7 @@ const ChangePassword = () => {
       });
 
       reset();
-    } catch (err) {
+    } catch {
       swal('Error', 'Failed to change password.', 'error');
     }
   };
@@ -53,87 +57,83 @@ const ChangePassword = () => {
   if (status === 'loading') return <LoadingSpinner />;
 
   return (
-    <div
+    <main
       className="d-flex justify-content-center align-items-center"
       style={{
-        height: '100vh',
-        width: '100vw',
-        background: 'linear-gradient(135deg, #8a00ff, #0066ff)',
-        padding: '20px',
+        minHeight: '100vh',
+        paddingTop: '120px',
+        paddingBottom: '120px',
       }}
     >
       <Card
-        className="p-4 shadow-lg border-0"
+        className="p-4 shadow-lg"
         style={{
           maxWidth: '480px',
           width: '100%',
-          borderRadius: '20px',
+          backgroundColor: '#111',
+          border: '2px solid #76b900', // NEON BORDER
+          borderRadius: '18px',
+          color: '#ffffff',
+          boxShadow: '0 0 25px rgba(118,185,0,0.35)', // NEON GLOW
         }}
       >
         <Card.Body>
           <h2
             className="fw-bold text-center mb-1"
-            style={{ color: '#00aaff' }}
+            style={{
+              color: '#76b900',
+              textShadow: '0 0 10px rgba(118,185,0,0.6)',
+            }}
           >
             Change Password
           </h2>
 
-          <p className="text-muted text-center mb-4">
-            Secure your UHConnect account
+          <p className="text-center mb-4" style={{ color: '#cccccc' }}>
+            Secure your UH Connect account
           </p>
 
           <Form onSubmit={handleSubmit(onSubmit)}>
+
             {/* Old Password */}
             <Form.Group className="mb-3">
-              <Form.Label>Old Password</Form.Label>
+              <Form.Label style={{ color: '#ffffff' }}>Old Password</Form.Label>
               <Form.Control
                 type="password"
                 {...register('oldpassword')}
                 className={errors.oldpassword ? 'is-invalid' : ''}
+                style={{ background: '#1a1a1a', color: '#ffffff' }}
               />
-              <div className="invalid-feedback">
-                {errors.oldpassword?.message}
-              </div>
+              <div className="invalid-feedback">{errors.oldpassword?.message}</div>
             </Form.Group>
 
             {/* New Password */}
             <Form.Group className="mb-3">
-              <Form.Label>New Password</Form.Label>
+              <Form.Label style={{ color: '#ffffff' }}>New Password</Form.Label>
               <Form.Control
                 type="password"
                 {...register('password')}
                 className={errors.password ? 'is-invalid' : ''}
+                style={{ background: '#1a1a1a', color: '#ffffff' }}
               />
-              <div className="invalid-feedback">
-                {errors.password?.message}
-              </div>
+              <div className="invalid-feedback">{errors.password?.message}</div>
             </Form.Group>
 
             {/* Confirm Password */}
             <Form.Group className="mb-4">
-              <Form.Label>Confirm New Password</Form.Label>
+              <Form.Label style={{ color: '#ffffff' }}>Confirm Password</Form.Label>
               <Form.Control
                 type="password"
                 {...register('confirmPassword')}
                 className={errors.confirmPassword ? 'is-invalid' : ''}
+                style={{ background: '#1a1a1a', color: '#ffffff' }}
               />
-              <div className="invalid-feedback">
-                {errors.confirmPassword?.message}
-              </div>
+              <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
             </Form.Group>
 
             {/* Buttons */}
             <Row>
               <Col xs={6}>
-                <Button
-                  type="submit"
-                  className="w-100 fw-bold"
-                  style={{
-                    background: 'linear-gradient(to right, #00aaff, #8a00ff)',
-                    border: 'none',
-                    borderRadius: '10px',
-                  }}
-                >
+                <Button className="w-100 fw-bold btn-primary" style={{ borderRadius: '10px' }}>
                   Change
                 </Button>
               </Col>
@@ -142,11 +142,9 @@ const ChangePassword = () => {
                 <Button
                   type="button"
                   className="w-100 fw-bold"
-                  style={{
-                    borderRadius: '10px',
-                  }}
                   variant="secondary"
                   onClick={() => reset()}
+                  style={{ borderRadius: '10px' }}
                 >
                   Reset
                 </Button>
@@ -155,7 +153,7 @@ const ChangePassword = () => {
           </Form>
         </Card.Body>
       </Card>
-    </div>
+    </main>
   );
 };
 

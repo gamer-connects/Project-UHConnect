@@ -1,119 +1,139 @@
 'use client';
 
 import React from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Card } from 'react-bootstrap';
 
 export default function AdminPage() {
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #7b2cbf, #0066ff)',
-        paddingTop: '100px', // SPACE BELOW HEADER
-        paddingBottom: '100px', // SPACE ABOVE FOOTER
-      }}
-    >
+    <main className="page-content" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
       <div
         style={{
-          maxWidth: '700px',
+          maxWidth: '750px',
           margin: '0 auto',
-          background: 'white',
-          padding: '35px',
-          borderRadius: '16px',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
         }}
       >
-        <h2
-          className="text-center"
-          style={{ color: '#0066ff', marginBottom: '25px' }}
+        <Card
+          style={{
+            backgroundColor: '#111',
+            border: '2px solid #76b900', // GREEN BORDER
+            borderRadius: '16px',
+            padding: '30px',
+            color: '#ffffff', // TEXT VISIBLE
+            boxShadow: '0 0 25px rgba(118,185,0,0.35)', // GLOW EFFECT
+          }}
         >
-          UHConnect Admin Panel
-        </h2>
+          <h2
+            className="text-center"
+            style={{
+              color: '#76b900',
+              fontWeight: 700,
+              marginBottom: '30px',
+              textShadow: '0 0 12px rgba(118,185,0,0.6)',
+            }}
+          >
+            UH Connect Admin Panel
+          </h2>
 
-        {/* ADD GAME */}
-        <section>
-          <h4 style={{ color: '#7b2cbf' }}>Add New Game</h4>
+          {/* ADD GAME */}
+          <section>
+            <h4 style={{ color: '#76b900', fontWeight: 600 }}>Add New Game</h4>
 
-          <Form className="mt-3">
-            <Form.Group className="mb-3">
-              <Form.Label>Game Name</Form.Label>
-              <Form.Control type="text" placeholder="Example: Valorant" />
-            </Form.Group>
+            <Form className="mt-3">
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Game Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Example: Valorant"
+                  style={{ background: '#1a1a1a', color: '#fff' }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Game Type</Form.Label>
-              <Form.Select>
-                <option value="">Select type</option>
-                <option value="FPS">FPS</option>
-                <option value="MOBA">MOBA</option>
-                <option value="RPG">RPG</option>
-                <option value="Fighting">Fighting</option>
-                <option value="Sports">Sports</option>
-              </Form.Select>
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Game Type</Form.Label>
+                <Form.Select style={{ background: '#1a1a1a', color: '#ffffff' }}>
+                  <option value="">Select type</option>
+                  <option value="FPS">FPS</option>
+                  <option value="MOBA">MOBA</option>
+                  <option value="RPG">RPG</option>
+                  <option value="Fighting">Fighting</option>
+                  <option value="Sports">Sports</option>
+                </Form.Select>
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Game Image URL</Form.Label>
-              <Form.Control type="text" placeholder="https://example.com/game.jpg" />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Game Image URL</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="https://example.com/game.jpg"
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control as="textarea" rows={3} placeholder="Describe the game..." />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Describe the game..."
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Button
-              style={{
-                width: '100%',
-                background: 'linear-gradient(90deg, #00c6ff, #7b2cbf)',
-                border: 'none',
-                fontWeight: 600,
-              }}
-            >
-              Add Game
-            </Button>
-          </Form>
-        </section>
+              <Button className="w-100 btn-primary" style={{ fontWeight: 700 }}>
+                Add Game
+              </Button>
+            </Form>
+          </section>
 
-        <hr className="my-4" />
+          <hr style={{ borderColor: '#2d2d2d', margin: '35px 0' }} />
 
-        {/* CREATE EVENT */}
-        <section>
-          <h4 style={{ color: '#7b2cbf' }}>Create Gaming Event</h4>
+          {/* CREATE EVENT */}
+          <section>
+            <h4 style={{ color: '#76b900', fontWeight: 600 }}>Create Gaming Event</h4>
 
-          <Form className="mt-3">
-            <Form.Group className="mb-3">
-              <Form.Label>Event Title</Form.Label>
-              <Form.Control type="text" placeholder="UH Smash Tournament" />
-            </Form.Group>
+            <Form className="mt-3">
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Event Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="UH Smash Tournament"
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Event Image URL</Form.Label>
-              <Form.Control type="text" placeholder="https://example.com/event.jpg" />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Event Image URL</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="https://example.com/event.jpg"
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Date</Form.Label>
-              <Form.Control type="date" />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control as="textarea" rows={3} placeholder="Event details..." />
-            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label style={{ color: '#ffffff' }}>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Event details..."
+                  style={{ background: '#1a1a1a', color: '#ffffff' }}
+                />
+              </Form.Group>
 
-            <Button
-              style={{
-                width: '100%',
-                background: 'linear-gradient(90deg, #00c6ff, #7b2cbf)',
-                border: 'none',
-                fontWeight: 600,
-              }}
-            >
-              Create Event
-            </Button>
-          </Form>
-        </section>
+              <Button className="w-100 btn-primary" style={{ fontWeight: 700 }}>
+                Create Event
+              </Button>
+            </Form>
+          </section>
+        </Card>
       </div>
     </main>
   );
