@@ -1,36 +1,37 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("UHCDB_POSTGRES_PRISMA_URL")
-  directUrl = env("UHCDB_POSTGRES_URL_NON_POOLING")
+  provider    = "postgresql"
+  url         = env("UHCDB_POSTGRES_PRISMA_URL")
+  directUrl   = env("UHCDB_POSTGRES_URL_NON_POOLING") // for Prisma Studio / sensitive queries
 }
 
 model User {
   id            Int      @id @default(autoincrement())
   email         String   @unique
   password      String
+  username      String   @unique
   role          Role     @default(USER)
   bio           String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  profileImage  String?  @default("/profile.png")
   followers     Int      @default(0)
   following     Int      @default(0)
-  gameInterests String[]
-  gameTags      String[]
-  profileImage  String?  @default("/profile.png")
-  username      String   @unique
+  gameInterests String[] // e.g. ["Valorant", "Elden Ring"]
+  gameTags      String[] // e.g. ["FPS", "Co-op", "Competitive"]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
-
 
 model Stuff {
   id        Int       @id @default(autoincrement())
   name      String
   quantity  Int
   condition Condition @default(good)
-  owner     String
+  owner     String    // You might want to make this User @relation later
 }
 
 enum Role {

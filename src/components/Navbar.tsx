@@ -13,6 +13,7 @@ const NavBar: React.FC = () => {
   const userWithRole = session?.user as { email: string; randomKey: string };
   const role = userWithRole?.randomKey;
   const pathName = usePathname();
+
   return (
     <Navbar expand="lg" className="navbar-custom">
       <Container>
@@ -22,22 +23,21 @@ const NavBar: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto justify-content-start">
-            <Nav.Link id="home-nav" href="/home" key="home" active={pathName === '/home'}>
+            {/* Always show Home */}
+            <Nav.Link id="home-nav" href="/home" key="home" active={pathName === '/'}>
               Home
             </Nav.Link>
-            <Nav.Link id="games-nav" href="/games" key="games" active={pathName === '/games'}>
-              Games
-            </Nav.Link>
-{currentUser
+
+            {currentUser
               ? [
-                  <Nav.Link id="profiles" href="/profiles" key="profiles" active={pathName === '/profiles'}>
+                  <Nav.Link id="profile-nav" href="/profiles" key="profile" active={pathName === '/profiles'}>
                     Profile
                   </Nav.Link>,
                   <Nav.Link
-                    id="usersearch-nav"
+                    id="user-search-nav"
                     href="/usersearch"
-                    key="usersearch"
-                    active={pathName === '/usersearch'}
+                    key="user-search"
+                    active={pathName === '/user-search'}
                   >
                     User Search
                   </Nav.Link>,
@@ -81,4 +81,5 @@ const NavBar: React.FC = () => {
     </Navbar>
   );
 };
+
 export default NavBar;
