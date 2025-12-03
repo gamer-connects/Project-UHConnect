@@ -1,327 +1,187 @@
+/* GLOBAL BASE */
 html,
 body {
-  --bs-light-rgb: 236, 236, 236;
-  box-sizing: border-box;
   height: 100%;
-  padding: 0;
   margin: 0;
-  background-color: #0d0d0d;
+  padding: 0;
+  box-sizing: border-box;
   color: #ffffff;
+
+  /* Match landing-page gradient */
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
+
+  background-attachment: fixed;
 }
 
+/* Layout wrapper */
 .wrapper {
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  background-color: #0d0d0d;
-}
-
-/* Main content wrapper - grows to fill space, pushes footer down */
-.main-content {
-  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  background-color: #0d0d0d;
+
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
 }
 
-/* All main elements should not have fixed heights */
+/* Page content */
 main {
-  background-color: #0d0d0d;
-  color: #ffffff;
-  padding-bottom: 3rem; /* Space before footer */
   flex: 1;
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
+
+  padding-bottom: 3rem;
 }
 
-/* Navbar Custom Styles - Gaming Theme */
-.navbar-custom {
+/* REMOVE white blocks from page content ONLY (NOT navbar/footer) */
+.page-content .container,
+.page-content .container-fluid,
+.page-content .row,
+.page-content .col {
+  background: transparent !important;
+}
+
+/* ---------------------------------------------
+   NAVBAR — KEEP VISIBLE
+--------------------------------------------- */
+.navbar-custom,
+.navbar-custom .container,
+.navbar-custom .container-fluid,
+.navbar-custom .row,
+.navbar-custom .col {
   background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%) !important;
+}
+
+.navbar-custom {
   box-shadow: 0 2px 10px rgba(118, 185, 0, 0.3);
-  padding: 1rem 0;
   border-bottom: 2px solid #76b900;
 }
 
 .navbar-brand-custom {
   color: #76b900 !important;
   font-size: 1.5rem;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(118, 185, 0, 0.5);
 }
 
-.navbar-brand-custom:hover {
-  color: #39ff14 !important;
-  text-shadow: 0 0 15px rgba(57, 255, 20, 0.8);
-}
-
-.navbar-custom .navbar-toggler {
-  border-color: #76b900;
-}
-
-.navbar-custom .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%2376b900' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-
 .navbar-custom .nav-link {
   color: #b3b3b3 !important;
-  font-weight: 500;
-  margin: 0 0.5rem;
-  transition: all 0.3s ease;
-  position: relative;
+  transition: 0.3s ease;
 }
 
 .navbar-custom .nav-link:hover {
   color: #76b900 !important;
-  transform: translateY(-2px);
 }
 
-.navbar-custom .nav-link.active {
-  color: #76b900 !important;
-  font-weight: 600;
-}
-
-.navbar-custom .nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background-color: #39ff14;
-  border-radius: 2px;
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
-}
-
-.navbar-custom .dropdown-toggle {
-  color: #b3b3b3 !important;
-  font-weight: 500;
-}
-
-.navbar-custom .dropdown-toggle:hover {
-  color: #76b900 !important;
-}
-
-.navbar-custom .dropdown-menu {
-  background-color: #1a1a1a;
-  border: 1px solid #76b900;
-  box-shadow: 0 4px 12px rgba(118, 185, 0, 0.3);
-  border-radius: 8px;
-  margin-top: 0.5rem;
-}
-
-.navbar-custom .dropdown-item {
-  padding: 0.75rem 1.5rem;
-  transition: all 0.2s ease;
-  color: #b3b3b3;
-}
-
-.navbar-custom .dropdown-item:hover {
-  background-color: #2d2d2d;
-  color: #76b900;
-}
-
-.navbar-custom .dropdown-item svg {
-  margin-right: 0.5rem;
-}
-
-/* Footer Styles - Gaming Theme */
+/* ---------------------------------------------
+   FOOTER — MATCH GLOBAL THEME
+--------------------------------------------- */
 .footer-custom {
-  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
-  color: #b3b3b3;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%) !important;
   border-top: 2px solid #76b900;
-  box-shadow: 0 -2px 10px rgba(118, 185, 0, 0.3);
-  flex-shrink: 0; /* Prevent footer from shrinking */
-  width: 100%;
+  color: #b3b3b3;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .footer-title {
-  font-size: 1.2rem;
-  letter-spacing: 1px;
   color: #76b900;
   font-weight: 700;
-}
-
-.footer-tagline {
-  font-style: italic;
-  opacity: 0.9;
-  color: #ffffff;
 }
 
 .footer-links span {
   color: #b3b3b3;
-  cursor: default;
 }
 
-.footer-links .text-muted {
-  color: #666666 !important;
-}
-
-/* Main content area styling */
-main {
-  background-color: #0d0d0d;
-  color: #ffffff;
-  min-height: 100vh;
-}
-
-/* Container styling */
-.container,
-.container-fluid {
-  background-color: #0d0d0d;
-}
-
-/* Table styling for dark theme */
-.table {
-  background-color: #1a1a1a;
-  color: #ffffff;
-  border-color: #2d2d2d;
-}
-
-.table thead {
-  background-color: #76b900;
-  color: #0d0d0d;
-  font-weight: 700;
-}
-
-.table thead th {
-  border-color: #39ff14;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #1a1a1a;
-}
-
-.table-striped tbody tr:nth-of-type(even) {
-  background-color: #151515;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #2d2d2d;
-  color: #76b900;
-}
-
-.table td,
-.table th {
-  border-color: #2d2d2d;
-}
-
-/* Buttons - Gaming Theme */
+/* ---------------------------------------------
+   BUTTONS
+--------------------------------------------- */
 .btn-primary {
   background: linear-gradient(135deg, #76b900 0%, #39ff14 100%);
   border: none;
   color: #0d0d0d;
   font-weight: 700;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(118, 185, 0, 0.3);
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #39ff14 0%, #76b900 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(57, 255, 20, 0.5);
 }
 
-.btn-secondary {
-  background-color: #2d2d2d;
-  border: 1px solid #76b900;
-  color: #76b900;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background-color: #76b900;
-  color: #0d0d0d;
-  border-color: #39ff14;
-}
-
-.btn-danger {
-  background-color: #cc0000;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-  background-color: #ff0000;
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-
-/* Form styling */
+/* ---------------------------------------------
+   FORMS
+--------------------------------------------- */
 .form-control {
   background-color: #1a1a1a;
+  color: white;
   border: 1px solid #2d2d2d;
-  color: #ffffff;
-  transition: all 0.3s ease;
 }
 
 .form-control:focus {
-  background-color: #1a1a1a;
   border-color: #76b900;
-  color: #ffffff;
-  box-shadow: 0 0 10px rgba(118, 185, 0, 0.5);
+  box-shadow: 0 0 8px rgba(118, 185, 0, 0.4);
 }
 
-.form-control::placeholder {
-  color: #666666;
-}
-
-.form-label {
-  color: #b3b3b3;
-  font-weight: 600;
-}
-
-/* Card styling */
+/* ---------------------------------------------
+   CARDS
+--------------------------------------------- */
 .card {
   background-color: #1a1a1a;
   border: 1px solid #2d2d2d;
-  color: #ffffff;
 }
 
 .card-header {
   background-color: #76b900;
   color: #0d0d0d;
   font-weight: 700;
-  border-bottom: 2px solid #39ff14;
 }
 
-.card-footer {
-  background-color: #151515;
-  border-top: 1px solid #2d2d2d;
-  color: #b3b3b3;
-}
-
-/* Headings */
+/* ---------------------------------------------
+   HEADINGS
+--------------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
 }
 
 h1 {
   color: #76b900;
-  text-shadow: 0 0 10px rgba(118, 185, 0, 0.3);
+  text-shadow: 0 0 8px rgba(118,185,0,0.3);
 }
 
-/* Links */
+/* ---------------------------------------------
+   LINKS
+--------------------------------------------- */
 a {
   color: #76b900;
-  transition: all 0.3s ease;
 }
 
 a:hover {
   color: #39ff14;
-  text-decoration: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .navbar-custom .nav-link {
-    margin: 0.5rem 0;
-  }
-  
-  .navbar-custom .nav-link.active::after {
-    display: none;
-  }
+/* Prevent layout bugs */
+* {
+  box-sizing: border-box;
 }
 
-main {
-  flex: 1;
+::placeholder {
+  color: #cccccc !important; 
+  opacity: 1 !important;
+}
+
+.form-control::placeholder {
+  color: #cccccc !important;
 }
