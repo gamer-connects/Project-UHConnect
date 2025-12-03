@@ -12,6 +12,7 @@ import { createUser } from '@/lib/dbActions';
 
 type SignUpForm = {
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
 };
@@ -19,6 +20,11 @@ type SignUpForm = {
 const SignUpPage: React.FC = () => {
   const validationSchema = Yup.object({
     email: Yup.string().required('Email is required').email('Invalid email'),
+    username: Yup.string()
+      .required('Username is required')
+      .min(3, 'Username must be at least 3 characters')
+      .max(20, 'Username must be at most 20 characters')
+      .matches(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
     password: Yup.string().required('Password required').min(6).max(40),
     confirmPassword: Yup.string()
       .required('Confirm Password required')
@@ -34,7 +40,7 @@ const SignUpPage: React.FC = () => {
   const onSubmit = async (data: SignUpForm) => {
     await createUser(data);
     await signIn('credentials', {
-      callbackUrl: '/home',
+      callbackUrl: '/add',
       email: data.email,
       password: data.password,
     });
@@ -95,6 +101,22 @@ const SignUpPage: React.FC = () => {
                   </Form.Group>
 
                   <Form.Group className="mt-3">
+                    <Form.Label style={{ color: '#b3b3b3', fontWeight: 600 }}>Username</Form.Label>
+                    <input
+                      type="text"
+                      {...register('username')}
+                      className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                      placeholder="Choose a unique username"
+                      style={{
+                        backgroundColor: '#0d0d0d',
+                        border: '1px solid #2d2d2d',
+                        color: '#ffffff',
+                      }}
+                    />
+                    <div className="invalid-feedback">{errors.username?.message}</div>
+                  </Form.Group>
+
+                  <Form.Group className="mt-3">
                     <Form.Label style={{ color: '#b3b3b3', fontWeight: 600 }}>Password</Form.Label>
                     <input
                       type="password"
@@ -148,11 +170,10 @@ const SignUpPage: React.FC = () => {
                         className="w-100"
                         onClick={() => reset()}
                         style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          border: 'none',
-                          fontWeight: 700,
-                          color: '#0d0d0d',
-                          boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
+                          backgroundColor: '#2d2d2d',
+                          border: '1px solid #76b900',
+                          color: '#76b900',
+                          fontWeight: 600,
                         }}
                       >
                         Reset
