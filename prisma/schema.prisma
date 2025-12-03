@@ -9,6 +9,31 @@ datasource db {
   directUrl = env("UHCDB_POSTGRES_URL_NON_POOLING")
 }
 
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  role          Role     @default(USER)
+  bio           String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  followers     Int      @default(0)
+  following     Int      @default(0)
+  gameInterests String[]
+  gameTags      String[]
+  profileImage  String?  @default("/profile.png")
+  username      String   @unique
+}
+
+
+model Stuff {
+  id        Int       @id @default(autoincrement())
+  name      String
+  quantity  Int
+  condition Condition @default(good)
+  owner     String
+}
+
 enum Role {
   USER
   ADMIN

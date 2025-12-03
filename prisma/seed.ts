@@ -23,7 +23,8 @@ async function main() {
       email: 'john@foo.com',
       password: hashedPassword, // Now it's properly hashed!
       username: 'JohnGamer123',
-      bio: 'Casual gamer looking to connect with others who enjoy competitive FPS games and RPGs. Always down for a good co-op session! Been gaming since 2010 and love discovering new indie titles.',
+      bio: 'Casual gamer looking to connect with others who enjoy competitive FPS games and RPGs. '
+      + 'Always down for a good co-op session! Been gaming since 2010 and love discovering new indie titles.',
       gameInterests: ['Valorant', 'League of Legends', 'Elden Ring', 'Minecraft', 'Apex Legends'],
       gameTags: ['FPS', 'RPG', 'Competitive', 'Co-op', 'Strategy'],
       followers: 42,

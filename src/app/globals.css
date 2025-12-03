@@ -1,137 +1,187 @@
+/* GLOBAL BASE */
 html,
 body {
-  --bs-light-rgb: 236, 236, 236;
-  box-sizing: border-box;
   height: 100%;
-  padding: 0;
   margin: 0;
-}
-.wrapper {
+  padding: 0;
   box-sizing: border-box;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
+  color: #ffffff;
+
+  /* Match landing-page gradient */
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
+
+  background-attachment: fixed;
 }
 
-/* Navbar Custom Styles */
+/* Layout wrapper */
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
+}
+
+/* Page content */
+main {
+  flex: 1;
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #1a1a1a 50%,
+    #0d0d0d 100%
+  ) !important;
+
+  padding-bottom: 3rem;
+}
+
+/* REMOVE white blocks from page content ONLY (NOT navbar/footer) */
+.page-content .container,
+.page-content .container-fluid,
+.page-content .row,
+.page-content .col {
+  background: transparent !important;
+}
+
+/* ---------------------------------------------
+   NAVBAR — KEEP VISIBLE
+--------------------------------------------- */
+.navbar-custom,
+.navbar-custom .container,
+.navbar-custom .container-fluid,
+.navbar-custom .row,
+.navbar-custom .col {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%) !important;
+}
+
 .navbar-custom {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(118, 185, 0, 0.3);
+  border-bottom: 2px solid #76b900;
 }
 
 .navbar-brand-custom {
-  color: #ffffff !important;
+  color: #76b900 !important;
   font-size: 1.5rem;
-  letter-spacing: 1px;
-  transition: opacity 0.3s ease;
-}
-
-.navbar-brand-custom:hover {
-  opacity: 0.9;
-}
-
-.navbar-custom .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.navbar-custom .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(118, 185, 0, 0.5);
 }
 
 .navbar-custom .nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 500;
-  margin: 0 0.5rem;
-  transition: all 0.3s ease;
-  position: relative;
+  color: #b3b3b3 !important;
+  transition: 0.3s ease;
 }
 
 .navbar-custom .nav-link:hover {
-  color: #ffffff !important;
-  transform: translateY(-2px);
+  color: #76b900 !important;
 }
 
-.navbar-custom .nav-link.active {
-  color: #ffffff !important;
-  font-weight: 600;
-}
-
-.navbar-custom .nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background-color: #4CAF50;
-  border-radius: 2px;
-}
-
-.navbar-custom .dropdown-toggle {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 500;
-}
-
-.navbar-custom .dropdown-toggle:hover {
-  color: #ffffff !important;
-}
-
-.navbar-custom .dropdown-menu {
-  background-color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  margin-top: 0.5rem;
-}
-
-.navbar-custom .dropdown-item {
-  padding: 0.75rem 1.5rem;
-  transition: background-color 0.2s ease;
-}
-
-.navbar-custom .dropdown-item:hover {
-  background-color: #f0f0f0;
-}
-
-.navbar-custom .dropdown-item svg {
-  margin-right: 0.5rem;
-}
-
-/* Footer Styles */
+/* ---------------------------------------------
+   FOOTER — MATCH GLOBAL THEME
+--------------------------------------------- */
 .footer-custom {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
-  border-top: 3px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%) !important;
+  border-top: 2px solid #76b900;
+  color: #b3b3b3;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .footer-title {
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-}
-
-.footer-tagline {
-  font-style: italic;
-  opacity: 0.9;
+  color: #76b900;
+  font-weight: 700;
 }
 
 .footer-links span {
-  color: rgba(255, 255, 255, 0.7);
-  cursor: default;
+  color: #b3b3b3;
 }
 
-.footer-links .text-muted {
-  color: rgba(255, 255, 255, 0.4) !important;
+/* ---------------------------------------------
+   BUTTONS
+--------------------------------------------- */
+.btn-primary {
+  background: linear-gradient(135deg, #76b900 0%, #39ff14 100%);
+  border: none;
+  color: #0d0d0d;
+  font-weight: 700;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .navbar-custom .nav-link {
-    margin: 0.5rem 0;
-  }
-  
-  .navbar-custom .nav-link.active::after {
-    display: none;
-  }
+.btn-primary:hover {
+  background: linear-gradient(135deg, #39ff14 0%, #76b900 100%);
+}
+
+/* ---------------------------------------------
+   FORMS
+--------------------------------------------- */
+.form-control {
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #2d2d2d;
+}
+
+.form-control:focus {
+  border-color: #76b900;
+  box-shadow: 0 0 8px rgba(118, 185, 0, 0.4);
+}
+
+/* ---------------------------------------------
+   CARDS
+--------------------------------------------- */
+.card {
+  background-color: #1a1a1a;
+  border: 1px solid #2d2d2d;
+}
+
+.card-header {
+  background-color: #76b900;
+  color: #0d0d0d;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------
+   HEADINGS
+--------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff;
+}
+
+h1 {
+  color: #76b900;
+  text-shadow: 0 0 8px rgba(118,185,0,0.3);
+}
+
+/* ---------------------------------------------
+   LINKS
+--------------------------------------------- */
+a {
+  color: #76b900;
+}
+
+a:hover {
+  color: #39ff14;
+}
+
+/* Prevent layout bugs */
+* {
+  box-sizing: border-box;
+}
+
+::placeholder {
+  color: #cccccc !important; 
+  opacity: 1 !important;
+}
+
+.form-control::placeholder {
+  color: #cccccc !important;
 }

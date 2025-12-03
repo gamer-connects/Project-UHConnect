@@ -1,3 +1,5 @@
+'use client';
+
 import HomeEvent from '@/components/HomeEvent';
 import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
@@ -10,13 +12,15 @@ export default function HomePage() {
     image: 'https://avatars.githubusercontent.com/u/229228841?v=4',
     tags: ['minecraft', 'server', 'survival'],
   };
+
   const samplePost2 = {
-    id: 1,
+    id: 2,
     username: 'FunHaverBob',
-    content: 'I love playing valorant with friends! Anyone up for a match?',
+    content: 'I love playing Valorant with friends! Anyone up for a match?',
     image: 'https://i.etsystatic.com/49980402/r/il/a4db6e/5759608293/il_570xN.5759608293_p54b.jpg',
     tags: ['valorant', 'LFG'],
   };
+
   const sampleEvent = {
     id: 1,
     title: 'Smash Bros Tournament',
@@ -28,47 +32,104 @@ export default function HomePage() {
   };
 
   const sampleEvent2 = {
-    id: 1,
+    id: 2,
     title: 'Minecraft Survival LAN Party',
     date: 'Nov 30, 2025',
     location: 'UH iLab',
-    description: 'Have fun with others in a minecraft survival LAN party!',
+    description: 'Have fun with others at the Minecraft LAN survival party!',
     flyer: 'https://m.media-amazon.com/images/I/71Vnfqb54GL.jpg',
     type: 'LAN Party',
   };
 
   return (
-    <div
+    <main
+      className="page-content"
       style={{
-        background: 'linear-gradient(135deg, #1E90FF 0%, #8A2BE2 100%)',
-        width: '100%',
+        paddingTop: '120px',
+        paddingBottom: '120px',
+        position: 'relative',
       }}
     >
-      <main className="container mt-4">
-        <h1 className="mb-4 text-center text-white">Home🏠</h1>
-        <Row className="mt-3">
-          <Col
-            style={{
-              backgroundColor: 'rgba(108, 117, 125, 0.7)', // bg-secondary with 70% opacity
-            }}
-            className="p-3 rounded me-3 mb-4"
-          >
-            <h2 className="text-center mb-3 text-white">Browse Posts</h2>
-            <HomePost post={samplePost} />
-            <HomePost post={samplePost2} />
+      {/* Neon Glow Background */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(118,185,0,0.08) 0%, transparent 50%),
+            radial-gradient(circle at 70% 80%, rgba(57,255,20,0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        <h1
+          className="text-center mb-5"
+          style={{
+            color: '#76b900',
+            fontWeight: 'bold',
+            textShadow: '0 0 20px rgba(118,185,0,0.5)',
+            fontSize: '3rem',
+          }}
+        >
+          Home
+        </h1>
+
+        <Row className="g-4">
+          {/* POSTS SECTION */}
+          <Col md={6}>
+            <div
+              style={{
+                backgroundColor: '#1a1a1a',
+                border: '2px solid #76b900',
+                boxShadow: '0 8px 32px rgba(118,185,0,0.25)',
+              }}
+              className="p-3 rounded"
+            >
+              <h2
+                className="text-center mb-3"
+                style={{
+                  color: '#76b900',
+                  fontWeight: 'bold',
+                  textShadow: '0 0 10px rgba(118,185,0,0.3)',
+                }}
+              >
+                Browse Posts
+              </h2>
+
+              <HomePost post={samplePost} />
+              <HomePost post={samplePost2} />
+            </div>
           </Col>
-          <Col
-            style={{
-              backgroundColor: 'rgba(108, 117, 125, 0.7)', // bg-secondary with 70% opacity
-            }}
-            className="p-3 rounded ms-3 mb-4"
-          >
-            <h2 className="text-center mb-3 text-white">Events</h2>
-            <HomeEvent event={sampleEvent} />
-            <HomeEvent event={sampleEvent2} />
+
+          {/* EVENTS SECTION */}
+          <Col md={6}>
+            <div
+              style={{
+                backgroundColor: '#1a1a1a',
+                border: '2px solid #76b900',
+                boxShadow: '0 8px 32px rgba(118,185,0,0.25)',
+              }}
+              className="p-3 rounded"
+            >
+              <h2
+                className="text-center mb-3"
+                style={{
+                  color: '#76b900',
+                  fontWeight: 'bold',
+                  textShadow: '0 0 10px rgba(118,185,0,0.3)',
+                }}
+              >
+                Events
+              </h2>
+
+              <HomeEvent event={sampleEvent} />
+              <HomeEvent event={sampleEvent2} />
+            </div>
           </Col>
         </Row>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

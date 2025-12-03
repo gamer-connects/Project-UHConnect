@@ -65,7 +65,7 @@ export async function deleteStuff(id: number) {
 
 /**
  * Creates a new user in the database.
- * @param credentials, an object with the following properties: email, password.
+ * @param credentials, an object with the following properties: email, password, username.
  */
 export async function createUser(credentials: { email: string; password: string }) {
   // console.lo`createUser data: ${JSON.stringify(credentials, null, 2)}`);
@@ -124,4 +124,64 @@ export async function changePassword(credentials: { email: string; password: str
       password,
     },
   });
+}
+
+/**
+ * Searches for users by username or email.
+ * @param searchQuery, the search string.
+ * @returns an array of users (without passwords).
+ */
+export async function searchUsers(searchQuery: string) {
+  if (!searchQuery.trim()) {
+    // If empty search, return all users
+    return prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        bio: true,
+        profileImage: true,
+        gameInterests: true,
+        gameTags: true,
+        followers: true,
+        following: true,
+        role: true,
+      },
+      take: 50,
+    });
+  }
+
+  // Search by username or email
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          email: {
+            contains: searchQuery,
+            mode: 'insensitive',
+          },
+        },
+        {
+          username: {
+            contains: searchQuery,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      bio: true,
+      profileImage: true,
+      gameInterests: true,
+      gameTags: true,
+      followers: true,
+      following: true,
+      role: true,
+    },
+    take: 50,
+  });
+  return users;
 }
