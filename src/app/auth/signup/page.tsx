@@ -40,7 +40,7 @@ const SignUpPage: React.FC = () => {
   const onSubmit = async (data: SignUpForm) => {
     await createUser(data);
     await signIn('credentials', {
-      callbackUrl: '/add',
+      callbackUrl: '/home',
       email: data.email,
       password: data.password,
     });
