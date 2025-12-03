@@ -67,23 +67,51 @@ export async function deleteStuff(id: number) {
  * Creates a new user in the database.
  * @param credentials, an object with the following properties: email, password.
  */
-export async function createUser(data: {
-  email: string;
-  password: string;
-  username: string;
-}) {
-  return prisma.user.create({
+export async function createUser(credentials: { email: string; password: string }) {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: credentials.email },
+  });
+
+  if (existingUser) {
+    throw new Error('User with this email already exists');
+  }
+
+  const baseUsername = credentials.email.split('@')[0];
+
+  // Get all usernames starting with baseUsername
+  const existingUsernames = await prisma.user.findMany({
+    where: { username: { startsWith: baseUsername } },
+    select: { username: true },
+  });
+
+  // Determine next available username
+  let username = baseUsername;
+  if (existingUsernames.length > 0) {
+    const taken = existingUsernames.map(u => u.username);
+
+    let counter = 1;
+    while (taken.includes(`${baseUsername}${counter}`)) {
+      counter++;
+    }
+
+    username = `${baseUsername}${counter}`;
+  }
+
+  const password = await hash(credentials.password, 10);
+
+  await prisma.user.create({
     data: {
-      email: data.email,
-      password: data.password,
-      username: data.username,
+      email: credentials.email,
+      password,
+      username,
       bio: '',
       gameInterests: [],
       gameTags: [],
+      followers: 0,
+      following: 0,
     },
   });
 }
-
 /**
  * Changes the password of an existing user in the database.
  * @param credentials, an object with the following properties: email, password.
