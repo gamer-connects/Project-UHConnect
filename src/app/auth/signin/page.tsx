@@ -19,7 +19,7 @@ const SignInPage: React.FC = () => {
     const password = target.password.value;
 
     await signIn('credentials', {
-      callbackUrl: '/list',
+      callbackUrl: '/home',
       email,
       password,
     });
