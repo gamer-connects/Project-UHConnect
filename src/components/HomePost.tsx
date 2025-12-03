@@ -6,10 +6,19 @@ import Link from 'next/link';
 type HomePostProps = {
   post: {
     id: number;
-    username: string;
     content: string;
-    image: string;
     tags: string[];
+    createdAt: string;
+
+    user: {
+      username: string;
+      profileImage: string | null;
+    };
+
+    game: {
+      name: string;
+      picture: string;
+    };
   };
 };
 
@@ -17,16 +26,15 @@ const HomePost = ({ post }: HomePostProps) => (
   <Card className="mb-3">
     <Card.Header className="d-flex align-items-center gap-3">
       <Image
-        src={post.image}
+        src={post.user.profileImage || '/profile.png'}
         width={60}
         height={60}
         className="rounded-circle"
-        alt="User image"
+        alt="User"
       />
-
       <div>
-        <Card.Title className="m-0">{post.username}</Card.Title>
-
+        <Card.Title className="m-0">{post.user.username}</Card.Title>
+        <small className="text-muted">{post.game.name}</small>
       </div>
     </Card.Header>
 

@@ -1,46 +1,125 @@
 import { PrismaClient, Role, Condition } from '@prisma/client';
-import { hash } from 'bcrypt';
-import * as config from '../config/settings.development.json';
+import config from '../config/settings.development.json';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding the database');
-  const password = await hash('changeme', 10);
-  config.defaultAccounts.forEach(async (account) => {
-    const role = account.role as Role || Role.USER;
-    console.log(`  Creating user: ${account.email} with role: ${role}`);
-    await prisma.user.upsert({
-      where: { email: account.email },
-      update: {},
-      create: {
-        email: account.email,
-        password,
-        role,
-      },
-    });
-    // console.log(`  Created user: ${user.email} with role: ${user.role}`);
-  });
-  for (const data of config.defaultData) {
-    const condition = data.condition as Condition || Condition.good;
-    console.log(`  Adding stuff: ${JSON.stringify(data)}`);
-    // eslint-disable-next-line no-await-in-loop
-    await prisma.stuff.upsert({
-      where: { id: config.defaultData.indexOf(data) + 1 },
-      update: {},
-      create: {
-        name: data.name,
-        quantity: data.quantity,
-        owner: data.owner,
-        condition,
-      },
-    });
+  console.log('Seeding database...');
+
+  //
+  // ---------------------------------------------------------------------
+  // 1. FULL USERS (defaultUsers)
+  // ---------------------------------------------------------------------
+  //
+  if (config.defaultUsers) {
+    await Promise.all(
+      config.defaultUsers.map(async (user) => {
+        console.log(`➡️  Creating user: ${user.email}`);
+
+        return prisma.user.upsert({
+          where: { id: user.id },
+          update: {},
+          create: {
+            id: user.id,
+            email: user.email,
+            password: user.password, // already hashed
+            role: (user.role as Role) || Role.USER,
+            username: user.username,
+            bio: user.bio,
+            profileImage: user.profileImage,
+            followers: user.followers,
+            following: user.following,
+            gameInterests: user.gameInterests || [],
+            gameTags: user.gameTags || [],
+            createdAt: new Date(user.createdAt),
+            updatedAt: new Date(user.updatedAt),
+          },
+        });
+      }),
+    );
   }
+
+  //
+  // ---------------------------------------------------------------------
+  // 2. STUFF (defaultData)
+  // ---------------------------------------------------------------------
+  //
+  if (config.defaultData) {
+    await Promise.all(
+      config.defaultData.map((item, index) => {
+        console.log(`Adding stuff: ${item.name}`);
+
+        return prisma.stuff.upsert({
+          where: { id: index + 1 },
+          update: {},
+          create: {
+            name: item.name,
+            quantity: item.quantity,
+            owner: item.owner,
+            condition: (item.condition as Condition) || Condition.good,
+          },
+        });
+      }),
+    );
+  }
+
+  //
+  // ---------------------------------------------------------------------
+  // 3. GAMES (defaultGames)
+  // ---------------------------------------------------------------------
+  //
+  if (config.defaultGames) {
+    await Promise.all(
+      config.defaultGames.map((game) => {
+        console.log(`Creating game: ${game.name}`);
+
+        return prisma.game.upsert({
+          where: { id: game.id },
+          update: {},
+          create: {
+            id: game.id,
+            name: game.name,
+            description: game.description,
+            picture: game.picture,
+          },
+        });
+      }),
+    );
+  }
+
+  //
+  // ---------------------------------------------------------------------
+  // 4. POSTS (defaultPosts)
+  // ---------------------------------------------------------------------
+  //
+  if (config.defaultPosts) {
+    await Promise.all(
+      config.defaultPosts.map((post) => {
+        console.log(`Creating post: ${post.id}`);
+
+        return prisma.post.upsert({
+          where: { id: post.id },
+          update: {},
+          create: {
+            id: post.id,
+            content: post.content,
+            tags: post.tags || [],
+            userID: post.userID,
+            gameID: post.gameID,
+            createdAt: new Date(post.createdAt),
+          },
+        });
+      }),
+    );
+  }
+
+  console.log('Database seeded successfully!');
 }
+
 main()
   .then(() => prisma.$disconnect())
   .catch(async (e) => {
-    console.error(e);
+    console.error('❌ Seed failed:', e);
     await prisma.$disconnect();
     process.exit(1);
   });
