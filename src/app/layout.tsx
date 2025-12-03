@@ -15,18 +15,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const classString = `${inter.className} wrapper`;
+}) {
   return (
     <html lang="en">
-      <body className={classString}>
+      <body className={`${inter.className} wrapper`}>
         <Providers>
           <NavBar />
-          <div className="main-content">
+
+          {/* Main wrapper is required for flex layout */}
+          <main>
             {children}
-          </div>
+          </main>
+
           <Footer />
         </Providers>
       </body>
