@@ -2,8 +2,9 @@
 
 import { Col, Container, Row, Card, Badge, Button } from 'react-bootstrap';
 import Image from 'next/image';
+import Link from 'next/link';
 
-/** The Profile page - displays user profile information */
+/** The Profile page - displays user profile information (MOCKUP) */
 const ProfilePage = () => (
   <main style={{
     minHeight: '100vh',
@@ -52,16 +53,20 @@ const ProfilePage = () => (
                       <span className="text-muted">Following</span>
                     </div>
                   </div>
-                  <Button
-                    style={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      border: 'none',
-                      padding: '0.5rem 1.5rem',
-                      fontWeight: '500',
-                    }}
-                  >
-                    Edit Profile
-                  </Button>
+                  <Link href="/profile/edit" passHref legacyBehavior>
+                    <Button
+                      as="a"
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        border: 'none',
+                        padding: '0.5rem 1.5rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Edit Profile
+                    </Button>
+                  </Link>
                 </Col>
               </Row>
             </Card.Body>
