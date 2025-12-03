@@ -67,12 +67,16 @@ export async function deleteStuff(id: number) {
  * Creates a new user in the database.
  * @param credentials, an object with the following properties: email, password.
  */
-export async function createUser(email: string, password: string) {
+export async function createUser(data: {
+  email: string;
+  password: string;
+  username: string;
+}) {
   return prisma.user.create({
     data: {
-      email,
-      password,
-      username: email.split('@')[0], // or accept from input
+      email: data.email,
+      password: data.password,
+      username: data.username,
       bio: '',
       gameInterests: [],
       gameTags: [],
