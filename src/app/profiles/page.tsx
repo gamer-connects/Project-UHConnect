@@ -2,7 +2,9 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { Col, Container, Row, Card, Badge, Button, Spinner } from 'react-bootstrap';
+import {
+  Col, Container, Row, Card, Badge, Button, Spinner,
+} from 'react-bootstrap';
 import Image from 'next/image';
 
 interface UserProfile {
@@ -54,13 +56,15 @@ const ProfilePage = () => {
 
   if (loading || status === 'loading') {
     return (
-      <main style={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      }}>
+      <main
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}
+      >
         <Spinner animation="border" variant="light" />
       </main>
     );
@@ -68,22 +72,24 @@ const ProfilePage = () => {
 
   if (error || !profile) {
     return (
-      <main style={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      }}>
+      <main
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}
+      >
         <div className="text-center">
           <p className="text-white">{error || 'Profile not found'}</p>
           {!session && (
-            <Button 
+            <Button
               href="/auth/signin"
-              style={{ 
+              style={{
                 marginTop: '1rem',
                 background: 'white',
-                color: '#667eea'
+                color: '#667eea',
               }}
             >
               Sign In
@@ -95,12 +101,24 @@ const ProfilePage = () => {
   }
 
   return (
-    <main style={{ minHeight: '100vh', padding: '2rem 0', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <main
+      style={{
+        minHeight: '100vh',
+        padding: '2rem 0',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}
+    >
       <Container id="profile-page" className="py-4">
         {/* Profile Header */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
-            <Card style={{ borderRadius: '15px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: 'none' }}>
+            <Card
+              style={{
+                borderRadius: '15px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                border: 'none',
+              }}
+            >
               <Card.Body className="p-4">
                 <Row className="align-items-center">
                   <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
@@ -114,19 +132,34 @@ const ProfilePage = () => {
                     />
                   </Col>
                   <Col xs={12} md={9}>
-                    <h2 style={{ color: '#333', fontWeight: 'bold' }}>{profile.username}</h2>
+                    <h2 style={{ color: '#333', fontWeight: 'bold' }}>
+                      {profile.username}
+                    </h2>
                     <p className="text-muted mb-3">{profile.email}</p>
                     <div className="d-flex gap-4 mb-3">
                       <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#667eea' }}>{profile.followers}</strong>{' '}
+                        <strong style={{ color: '#667eea' }}>
+                          {profile.followers}
+                        </strong>
+                        {' '}
                         <span className="text-muted">Followers</span>
                       </div>
                       <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#667eea' }}>{profile.following}</strong>{' '}
+                        <strong style={{ color: '#667eea' }}>
+                          {profile.following}
+                        </strong>
+                        {' '}
                         <span className="text-muted">Following</span>
                       </div>
                     </div>
-                    <Button style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none', padding: '0.5rem 1.5rem', fontWeight: '500' }}>
+                    <Button
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        border: 'none',
+                        padding: '0.5rem 1.5rem',
+                        fontWeight: '500',
+                      }}
+                    >
                       Edit Profile
                     </Button>
                   </Col>
@@ -139,9 +172,23 @@ const ProfilePage = () => {
         {/* About Me */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
-            <Card style={{ borderRadius: '15px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: 'none' }}>
+            <Card
+              style={{
+                borderRadius: '15px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                border: 'none',
+              }}
+            >
               <Card.Body className="p-4">
-                <h4 style={{ color: '#333', fontWeight: 'bold', marginBottom: '1rem' }}>About Me</h4>
+                <h4
+                  style={{
+                    color: '#333',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  About Me
+                </h4>
                 <p style={{ color: '#555', lineHeight: '1.6' }}>
                   {profile.bio || 'No bio yet. Click Edit Profile to add one!'}
                 </p>
@@ -153,18 +200,42 @@ const ProfilePage = () => {
         {/* Game Interests */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
-            <Card style={{ borderRadius: '15px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: 'none' }}>
+            <Card
+              style={{
+                borderRadius: '15px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                border: 'none',
+              }}
+            >
               <Card.Body className="p-4">
-                <h4 style={{ color: '#333', fontWeight: 'bold', marginBottom: '1rem' }}>Game Interests</h4>
+                <h4
+                  style={{
+                    color: '#333',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  Game Interests
+                </h4>
                 <div className="d-flex flex-wrap gap-2">
-                  {profile.gameInterests.length ? profile.gameInterests.map((game, i) => (
-                    <Badge
-                      key={i}
-                      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', padding: '0.5rem 1rem', fontSize: '0.9rem', fontWeight: '500', borderRadius: '20px' }}
-                    >
-                      {game}
-                    </Badge>
-                  )) : <p className="text-muted">No game interests added yet</p>}
+                  {profile.gameInterests.length ? (
+                    profile.gameInterests.map((game) => (
+                      <Badge
+                        key={game}
+                        style={{
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          padding: '0.5rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: '500',
+                          borderRadius: '20px',
+                        }}
+                      >
+                        {game}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-muted">No game interests added yet</p>
+                  )}
                 </div>
               </Card.Body>
             </Card>
@@ -174,15 +245,42 @@ const ProfilePage = () => {
         {/* Gaming Preferences */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
-            <Card style={{ borderRadius: '15px', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: 'none' }}>
+            <Card
+              style={{
+                borderRadius: '15px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                border: 'none',
+              }}
+            >
               <Card.Body className="p-4">
-                <h4 style={{ color: '#333', fontWeight: 'bold', marginBottom: '1rem' }}>Gaming Preferences</h4>
+                <h4
+                  style={{
+                    color: '#333',
+                    fontWeight: 'bold',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  Gaming Preferences
+                </h4>
                 <div className="d-flex flex-wrap gap-2">
-                  {profile.gameTags.length ? profile.gameTags.map((tag, i) => (
-                    <Badge key={i} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', fontWeight: '500', borderRadius: '20px', backgroundColor: '#6c757d' }}>
-                      {tag}
-                    </Badge>
-                  )) : <p className="text-muted">No gaming preferences added yet</p>}
+                  {profile.gameTags.length ? (
+                    profile.gameTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: '500',
+                          borderRadius: '20px',
+                          backgroundColor: '#6c757d',
+                        }}
+                      >
+                        {tag}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-muted">No gaming preferences added yet</p>
+                  )}
                 </div>
               </Card.Body>
             </Card>

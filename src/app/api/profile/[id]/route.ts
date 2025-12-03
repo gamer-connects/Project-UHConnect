@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(params.id, 10) },
       select: {
         id: true,
         username: true,
@@ -20,7 +20,7 @@ export async function GET(
         following: true,
         gameInterests: true,
         gameTags: true,
-      }
+      },
     });
 
     if (!user) {
@@ -43,7 +43,7 @@ export async function PUT(
     const { username, bio, gameInterests, gameTags } = body;
 
     const updatedUser = await prisma.user.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(params.id, 10) },
       data: {
         username,
         bio,

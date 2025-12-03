@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import './usersearch.css';
 import {
   Col,
@@ -22,7 +23,7 @@ const games = [
   { name: 'Genshin Impact', cover: '/covers/genshin.jpg' },
   { name: 'Rocket League', cover: '/covers/rocketleague.jpg' },
   { name: 'Dota 2', cover: '/covers/dota2.jpg' },
-] as const; // ← fixes "const assertions" warning if you have it
+] as const;
 
 export default function UserSearch() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,7 +44,6 @@ export default function UserSearch() {
               <h1 className="display-5 fw-bold">User Search</h1>
               <p className="lead opacity-90">Find gamers across the network</p>
             </div>
-
             {/* Search Bar */}
             <div className="search-card mb-4">
               <InputGroup size="lg">
@@ -58,7 +58,6 @@ export default function UserSearch() {
                 <Button variant="success">Search</Button>
               </InputGroup>
             </div>
-
             {/* Game Filter Grid */}
             <h4 className="mb-4 game-filter-title">Filter by Game</h4>
             <div className="game-grid-sidebar">
@@ -71,13 +70,18 @@ export default function UserSearch() {
                   onClick={() => handleGameClick(game.name)}
                   onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game.name)}
                 >
-                  <img src={game.cover} alt={game.name} />
+                  <Image
+                    src={game.cover}
+                    alt={game.name}
+                    width={200}
+                    height={200}
+                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                  />
                   <div className="game-name-overlay">{game.name}</div>
                 </div>
               ))}
             </div>
           </Col>
-
           {/* ─────── RIGHT RESULTS AREA ─────── */}
           <Col lg={7} xl={8} className="ps-lg-5">
             <div className="results-area">
@@ -88,7 +92,6 @@ export default function UserSearch() {
                   return 'Search for players or pick a game';
                 })()}
               </h2>
-
               <div className="placeholder-glow">
                 <p className="lead text-center text-white-50 mt-5">
                   {selectedGame || searchQuery

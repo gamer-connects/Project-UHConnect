@@ -21,7 +21,7 @@ export async function GET(
         following: true,
         gameInterests: true,
         gameTags: true,
-      }
+      },
     });
 
     if (!user) {
