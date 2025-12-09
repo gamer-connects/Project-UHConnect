@@ -24,12 +24,10 @@ body {
   background-color: #0d0d0d;
 }
 
-/* All main elements should not have fixed heights */
+/* Main content area styling */
 main {
   background-color: #0d0d0d;
   color: #ffffff;
-  padding-bottom: 3rem; /* Space before footer */
-  flex: 1;
 }
 
 /* Navbar Custom Styles - Gaming Theme */

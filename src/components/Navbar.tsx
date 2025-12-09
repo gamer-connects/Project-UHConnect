@@ -41,6 +41,14 @@ const NavBar: React.FC = () => {
                   >
                     User Search
                   </Nav.Link>,
+                  <Nav.Link
+                    id="request-event-nav"
+                    href="/request-event"
+                    key="request-event"
+                    active={pathName === '/request-event'}
+                  >
+                    Request Event
+                  </Nav.Link>,
                 ]
               : ''}
             {currentUser && role === 'ADMIN' ? (
