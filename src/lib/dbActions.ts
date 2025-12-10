@@ -10,7 +10,7 @@ import { prisma } from './prisma';
  * @param stuff, an object with the following properties: name, quantity, owner, condition.
  */
 export async function addStuff(stuff: { name: string; quantity: number; owner: string; condition: string }) {
-  // console.log(`addStuff data: ${JSON.stringify(stuff, null, 2)}`);
+  // console.log`addStuff data: ${JSON.stringify(stuff, null, 2)}`);
   let condition: Condition = 'good';
   if (stuff.condition === 'poor') {
     condition = 'poor';
@@ -36,7 +36,7 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
  * @param stuff, an object with the following properties: id, name, quantity, owner, condition.
  */
 export async function editStuff(stuff: Stuff) {
-  // console.log(`editStuff data: ${JSON.stringify(stuff, null, 2)}`);
+  // console.log`editStuff data: ${JSON.stringify(stuff, null, 2)}`);
   await prisma.stuff.update({
     where: { id: stuff.id },
     data: {
@@ -55,7 +55,7 @@ export async function editStuff(stuff: Stuff) {
  * @param id, the id of the stuff to delete.
  */
 export async function deleteStuff(id: number) {
-  // console.log(`deleteStuff id: ${id}`);
+  // console.log`deleteStuff id: ${id}`);
   await prisma.stuff.delete({
     where: { id },
   });
@@ -67,14 +67,46 @@ export async function deleteStuff(id: number) {
  * Creates a new user in the database.
  * @param credentials, an object with the following properties: email, password, username.
  */
-export async function createUser(credentials: { email: string; password: string; username: string }) {
-  // console.log(`createUser data: ${JSON.stringify(credentials, null, 2)}`);
+export async function createUser(credentials: { email: string; password: string }) {
+  // console.lo`createUser data: ${JSON.stringify(credentials, null, 2)}`);
+  // Check if user already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email: credentials.email },
+  });
+
+  if (existingUser) {
+    throw new Error('User with this email already exists');
+  }
+
+  // Generate username from email (before @)
+  const baseUsername = credentials.email.split('@')[0];
+
+  // Check if username exists, if so, add a number
+  let username = baseUsername;
+  let counter = 1;
+  let usernameExists = await prisma.user.findUnique({ where: { username } });
+
+  while (usernameExists) {
+    username = `${baseUsername}${counter}`;
+    counter += 1;
+    // eslint-disable-next-line no-await-in-loop
+    usernameExists = await prisma.user.findUnique({ where: { username } });
+  }
+
+  // Hash password
   const password = await hash(credentials.password, 10);
+
+  // Create user with all required fields
   await prisma.user.create({
     data: {
       email: credentials.email,
       password,
-      username: credentials.username,
+      username, // NEW - required field
+      bio: '', // NEW - default empty
+      gameInterests: [], // NEW - empty array
+      gameTags: [], // NEW - empty array
+      followers: 0, // NEW - starts at 0
+      following: 0, // NEW - starts at 0
     },
   });
 }
@@ -84,7 +116,7 @@ export async function createUser(credentials: { email: string; password: string;
  * @param credentials, an object with the following properties: email, password.
  */
 export async function changePassword(credentials: { email: string; password: string }) {
-  // console.log(`changePassword data: ${JSON.stringify(credentials, null, 2)}`);
+  // console.log`changePassword data: ${JSON.stringify(credentials, null, 2)}`);
   const password = await hash(credentials.password, 10);
   await prisma.user.update({
     where: { email: credentials.email },

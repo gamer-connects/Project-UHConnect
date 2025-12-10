@@ -26,14 +26,15 @@ const HomePost = ({ post }: HomePostProps) => (
 
       <div>
         <Card.Title className="m-0">{post.username}</Card.Title>
-
       </div>
     </Card.Header>
 
     <Card.Body>
-      <Card.Text>{post.content}</Card.Text>
+      {/* FIXED TEXT VISIBILITY */}
+      <Card.Text style={{ color: 'white' }}>
+        {post.content}
+      </Card.Text>
 
-      {/* Tags */}
       <div className="d-flex flex-wrap gap-2 mt-2">
         {post.tags.map((tag) => (
           <Badge bg="secondary" key={tag}>

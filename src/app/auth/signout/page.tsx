@@ -7,54 +7,60 @@ import {
 } from 'react-bootstrap';
 
 const SignOut: React.FC = () => (
-  <div
+  <main
     className="d-flex justify-content-center align-items-center"
     style={{
-      height: '100vh',
-      width: '100vw',
-      background: 'linear-gradient(135deg, #8a00ff, #0066ff)',
-      padding: '20px',
+      minHeight: '100vh',
+      paddingTop: '120px',
+      paddingBottom: '120px',
     }}
   >
     <Card
-      className="p-5 shadow-lg border-0"
+      className="p-5 shadow-lg"
       style={{
         maxWidth: '480px',
         width: '100%',
-        borderRadius: '20px',
+        backgroundColor: '#111',
+        border: '2px solid #76b900', // NEON GREEN BORDER
+        borderRadius: '18px',
+        color: '#ffffff',
+        boxShadow: '0 0 25px rgba(118,185,0,0.35)', // GREEN GLOW
       }}
     >
       <Card.Body className="text-center">
 
-        {/* Title */}
         <h2
-          className="fw-bold mb-2"
-          style={{ color: '#00aaff', fontSize: '28px' }}
+          className="fw-bold mb-3"
+          style={{
+            color: '#76b900',
+            textShadow: '0 0 10px rgba(118,185,0,0.6)',
+            fontSize: '28px',
+          }}
         >
           Sign Out
         </h2>
 
-        {/* Subtitle */}
-        <p className="text-muted mb-4" style={{ fontSize: '15px' }}>
+        <p style={{ color: '#cccccc', fontSize: '15px' }}>
           You&apos;re about to leave
           {' '}
-          <strong>UHConnect</strong>
+          <strong>UH Connect</strong>
           .
         </p>
 
-        <p className="fw-semibold mb-4" style={{ fontSize: '16px' }}>
+        <p
+          className="fw-semibold mb-4"
+          style={{ fontSize: '16px', color: '#ffffff' }}
+        >
           Are you sure you want to sign out?
         </p>
 
-        {/* Buttons */}
         <Row className="gy-3 mt-2 px-1">
           <Col xs={12}>
             <Button
-              className="w-100 fw-bold py-2"
+              className="w-100 fw-bold py-2 btn-primary"
               style={{
-                background: 'linear-gradient(to right, #00aaff, #8a00ff)',
-                border: 'none',
                 borderRadius: '10px',
+                fontWeight: 700,
               }}
               onClick={() => signOut({ callbackUrl: '/', redirect: true })}
             >
@@ -68,6 +74,7 @@ const SignOut: React.FC = () => (
               className="w-100 fw-bold py-2"
               style={{
                 borderRadius: '10px',
+                fontWeight: 700,
               }}
               href="/"
             >
@@ -77,7 +84,7 @@ const SignOut: React.FC = () => (
         </Row>
       </Card.Body>
     </Card>
-  </div>
+  </main>
 );
 
 export default SignOut;
