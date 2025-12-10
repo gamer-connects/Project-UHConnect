@@ -13,6 +13,8 @@ export default function RequestEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<string | null>(null);
 
   // Redirect if not authenticated
   if (status === 'unauthenticated') {
@@ -49,6 +51,7 @@ export default function RequestEventPage() {
       estimatedPlayers: formData.get('estimatedPlayers') as string,
       location: formData.get('location') as string,
       additionalNotes: formData.get('additionalNotes') as string,
+      eventPoster: imageFile, // Add the base64 image
     };
 
     try {
@@ -65,10 +68,8 @@ export default function RequestEventPage() {
       }
 
       setSuccess(true);
-      // Reset form
-      e.currentTarget.reset();
 
-      // Optionally redirect after success
+      // Redirect after success (removed form reset to avoid the error)
       setTimeout(() => {
         router.push('/home');
       }, 2000);
@@ -79,25 +80,60 @@ export default function RequestEventPage() {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please upload an image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image must be smaller than 5MB');
+        return;
+      }
+
+      // Convert to base64 for preview and storage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        setImageFile(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setImageFile(null);
+  };
+
   return (
     <div style={{
-      minHeight: '600px',
-      height: 'calc(100vh - 250px)',
+      minHeight: 'calc(100vh - 100px)',
+      height: 'calc(100vh - 100px)',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: 'stretch',
       padding: '2rem 0',
     }}
     >
-      <Container style={{ maxWidth: '900px' }}>
-        <Row className="justify-content-center">
-          <Col lg={10}>
+      <Container style={{
+        maxWidth: '900px',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+      }}
+      >
+        <Row className="justify-content-center flex-grow-1">
+          <Col lg={10} className="d-flex">
             <Card
-              className="shadow-lg border-0"
+              className="shadow-lg border-0 w-100"
               style={{
                 backgroundColor: '#1a1a1a',
                 border: '1px solid #76b900',
-                maxHeight: 'calc(100vh - 300px)',
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -285,6 +321,47 @@ export default function RequestEventPage() {
                         color: '#fff',
                       }}
                     />
+                  </Form.Group>
+
+                  {/* Event Poster Upload */}
+                  <Form.Group className="mb-4">
+                    <Form.Label className="text-light">Event Poster (Optional)</Form.Label>
+                    <Form.Control
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{
+                        backgroundColor: '#0d0d0d',
+                        border: '1px solid #76b900',
+                        color: '#fff',
+                      }}
+                    />
+                    <Form.Text className="text-muted">
+                      Upload a poster/image for your event (max 5MB)
+                    </Form.Text>
+
+                    {imagePreview && (
+                      <div className="mt-3 position-relative">
+                        <img
+                          src={imagePreview}
+                          alt="Event poster preview"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '300px',
+                            borderRadius: '8px',
+                            border: '2px solid #76b900',
+                          }}
+                        />
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={removeImage}
+                          className="position-absolute top-0 end-0 m-2"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    )}
                   </Form.Group>
 
                   <div className="d-grid gap-2">

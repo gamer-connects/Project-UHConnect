@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       estimatedPlayers,
       location,
       additionalNotes,
+      eventPoster,
     } = body;
 
     // Validate required fields
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
         estimatedPlayers: estimatedPlayers ? parseInt(estimatedPlayers, 10) : null,
         location: location?.trim() || null,
         additionalNotes: additionalNotes?.trim() || null,
+        eventPoster: eventPoster || null,
         status: 'PENDING',
       },
     });

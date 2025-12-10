@@ -46,6 +46,7 @@ model EventRequest {
   estimatedPlayers Int?
   location         String?
   additionalNotes  String?
+  eventPoster      String?       // Base64 encoded image or URL
   status           RequestStatus @default(PENDING)
   adminNotes       String?
   createdAt        DateTime      @default(now())

@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+'use client';
+
 import { Inter } from 'next/font/google';
+import { usePathname } from 'next/navigation';
 import './globals.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Footer from '@/components/Footer';
@@ -8,10 +10,18 @@ import Providers from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'UH Connect - Gaming Social Network',
-  description: 'Connect with UH gamers and build your gaming community',
-};
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const hideFooter = pathname === '/request-event';
+
+  return (
+    <>
+      <NavBar />
+      <main>{children}</main>
+      {!hideFooter && <Footer />}
+    </>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -22,14 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} wrapper`}>
         <Providers>
-          <NavBar />
-
-          {/* Main wrapper is required for flex layout */}
-          <main>
-            {children}
-          </main>
-
-          <Footer />
+          <LayoutContent>{children}</LayoutContent>
         </Providers>
       </body>
     </html>
