@@ -66,3 +66,22 @@ enum Condition {
   fair
   poor
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Condition {
+  excellent
+  good
+  fair
+  poor
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_REVIEW
+}
