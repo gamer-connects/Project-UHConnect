@@ -34,6 +34,27 @@ model Stuff {
   owner     String    // You might want to make this User @relation later
 }
 
+model EventRequest {
+  id               Int           @id @default(autoincrement())
+  userId           Int
+  userEmail        String
+  username         String
+  eventName        String
+  eventType        String
+  gameTitle        String
+  description      String
+  suggestedDate    DateTime?
+  suggestedTime    String?
+  estimatedPlayers Int?
+  location         String?
+  additionalNotes  String?
+  eventPoster      String?       // Base64 encoded image or URL
+  status           RequestStatus @default(PENDING)
+  adminNotes       String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
 enum Role {
   USER
   ADMIN
@@ -44,4 +65,11 @@ enum Condition {
   good
   fair
   poor
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_REVIEW
 }
