@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Card } from 'react-bootstrap';
 
 interface GameCardProps {
@@ -21,6 +20,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
         border: '2px solid #76b900',
         boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
         transition: 'all 0.3s ease',
+        cursor: 'pointer',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-8px)';
@@ -33,24 +33,36 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
         e.currentTarget.style.borderColor = '#76b900';
       }}
     >
+      {/* ================= IMAGE ================= */}
       <div
         style={{
           width: '100%',
           height: '360px',
-          position: 'relative',
           background: '#0d0d0d',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
         }}
       >
-        <Image
+        <img
           src={image}
           alt={title}
-          fill
           style={{
+            width: '100%',
+            height: '100%',
             objectFit: 'contain',
+            display: 'block',
+          }}
+          onError={(e) => {
+            // fallback icon if image fails
+            e.currentTarget.src =
+              'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
           }}
         />
       </div>
 
+      {/* ================= TITLE ================= */}
       <Card.Body className="text-center" style={{ backgroundColor: '#1a1a1a' }}>
         <Card.Title
           className="fw-bold fs-5"

@@ -5,10 +5,10 @@ generator client {
 }
 
 datasource db {
-  provider    = "postgresql"
-  url         = env("UHCDB_POSTGRES_PRISMA_URL")
-  directUrl   = env("UHCDB_POSTGRES_URL_NON_POOLING") // for Prisma Studio / sensitive queries
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 
 model User {
   id            Int      @id @default(autoincrement())
@@ -72,4 +72,24 @@ enum RequestStatus {
   APPROVED
   REJECTED
   IN_REVIEW
+}
+
+model Game {
+  id          Int      @id @default(autoincrement())
+  title       String
+  type        String
+  image       String
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  date        DateTime
+  location    String
+  description String
+  flyer       String
+  type        String
+  createdAt   DateTime @default(now())
 }

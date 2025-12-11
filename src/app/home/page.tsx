@@ -1,10 +1,40 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import HomeEvent from '@/components/HomeEvent';
 import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
+import { EventType } from '@/types/event';
 
 export default function HomePage() {
+  // ===============================
+  // STATE FOR EVENTS
+  // ===============================
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // ===============================
+  // FETCH EVENTS FROM API
+  // ===============================
+  useEffect(() => {
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events');
+        const data = await res.json();
+        setEvents(data);
+      } catch (error) {
+        console.error('Failed to load events:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadEvents();
+  }, []);
+
+  // ===============================
+  // SAMPLE POSTS (STATIC FOR NOW)
+  // ===============================
   const samplePost = {
     id: 1,
     username: 'andrew123',
@@ -21,26 +51,6 @@ export default function HomePage() {
     tags: ['valorant', 'LFG'],
   };
 
-  const sampleEvent = {
-    id: 1,
-    title: 'Smash Bros Tournament',
-    date: 'Nov 30, 2025',
-    location: 'Online Server',
-    description: 'Join our epic Smash Bros tournament and win prizes!',
-    flyer: 'https://www.sandiego.edu/uploads/8ea582779838a6e4477062c65d71c12d.png',
-    type: 'Tournament',
-  };
-
-  const sampleEvent2 = {
-    id: 2,
-    title: 'Minecraft Survival LAN Party',
-    date: 'Nov 30, 2025',
-    location: 'UH iLab',
-    description: 'Have fun with others at the Minecraft LAN survival party!',
-    flyer: 'https://m.media-amazon.com/images/I/71Vnfqb54GL.jpg',
-    type: 'LAN Party',
-  };
-
   return (
     <main
       className="page-content"
@@ -50,14 +60,14 @@ export default function HomePage() {
         position: 'relative',
       }}
     >
-      {/* Neon Glow Background */}
+      {/* Background Glow */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background: `
             radial-gradient(circle at 30% 20%, rgba(118,185,0,0.08) 0%, transparent 50%),
-            radial-gradient(circle at 70% 80%, rgba(57,255,20,0.05) 0%, transparent 50%)
+            radial-gradient(circle at 70% 80%, rgba(57,255,20,0,0.05) 0%, transparent 50%)
           `,
           pointerEvents: 'none',
         }}
@@ -77,7 +87,9 @@ export default function HomePage() {
         </h1>
 
         <Row className="g-4">
+          {/* ============================ */}
           {/* POSTS SECTION */}
+          {/* ============================ */}
           <Col md={6}>
             <div
               style={{
@@ -103,7 +115,9 @@ export default function HomePage() {
             </div>
           </Col>
 
+          {/* ============================ */}
           {/* EVENTS SECTION */}
+          {/* ============================ */}
           <Col md={6}>
             <div
               style={{
@@ -124,8 +138,24 @@ export default function HomePage() {
                 Events
               </h2>
 
-              <HomeEvent event={sampleEvent} />
-              <HomeEvent event={sampleEvent2} />
+              {/* Loading Spinner */}
+              {loading && (
+                <p className="text-center" style={{ color: '#aaa' }}>
+                  Loading events...
+                </p>
+              )}
+
+              {/* No Events */}
+              {!loading && events.length === 0 && (
+                <p className="text-center" style={{ color: '#aaa' }}>
+                  No events yet.
+                </p>
+              )}
+
+              {/* Render Events */}
+              {events.map((event) => (
+                <HomeEvent key={event.id} event={event} />
+              ))}
             </div>
           </Col>
         </Row>
