@@ -185,3 +185,13 @@ export async function searchUsers(searchQuery: string) {
   });
   return users;
 }
+
+export default async function getAllPosts() {
+  return prisma.post.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: true,
+      game: true,
+    },
+  });
+}
