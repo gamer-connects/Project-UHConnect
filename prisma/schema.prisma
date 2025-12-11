@@ -97,7 +97,7 @@ model Event {
 }
 
 // ===============================
-// 🚨 MISSING MODEL — POST MODEL
+// POST MODEL
 // ===============================
 model Post {
   id        Int      @id @default(autoincrement())
