@@ -49,7 +49,7 @@ export default async function GamesPage() {
             <Col key={game.id} className="d-flex justify-content-center">
               <GameCard
                 name={game.name}
-                picture={game.picture || '/games/fallback.png'}
+                picture={game.picture}
                 href={`/games/${encodeURIComponent(game.name.toLowerCase().replace(/\s+/g, '-'))}`}
               />
             </Col>
