@@ -1,26 +1,16 @@
-'use client';
-
 import HomeEvent from '@/components/HomeEvent';
 import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
+import { prisma } from '@/lib/prisma';
 
-export default function HomePage() {
-  const samplePost = {
-    id: 1,
-    username: 'andrew123',
-    content: 'This is my first post! My favorite game is Minecraft!',
-    image: 'https://avatars.githubusercontent.com/u/229228841?v=4',
-    tags: ['minecraft', 'server', 'survival'],
-  };
-
-  const samplePost2 = {
-    id: 2,
-    username: 'FunHaverBob',
-    content: 'I love playing Valorant with friends! Anyone up for a match?',
-    image: 'https://i.etsystatic.com/49980402/r/il/a4db6e/5759608293/il_570xN.5759608293_p54b.jpg',
-    tags: ['valorant', 'LFG'],
-  };
-
+export default async function HomePage() {
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: true,
+      game: true,
+    },
+  });
   const sampleEvent = {
     id: 1,
     title: 'Smash Bros Tournament',
@@ -98,8 +88,25 @@ export default function HomePage() {
                 Browse Posts
               </h2>
 
-              <HomePost post={samplePost} />
-              <HomePost post={samplePost2} />
+              {posts.map((post) => (
+                <HomePost
+                  key={post.id}
+                  post={{
+                    id: post.id,
+                    content: post.content,
+                    createdAt: post.createdAt.toISOString(),
+                    tags: post.tags,
+                    user: {
+                      username: post.user.username,
+                      profileImage: post.user.profileImage,
+                    },
+                    game: {
+                      name: post.game.name,
+                      picture: post.game.picture,
+                    },
+                  }}
+                />
+              ))}
             </div>
           </Col>
 

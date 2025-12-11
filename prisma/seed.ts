@@ -1,45 +1,110 @@
-import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcrypt';
+import { PrismaClient, Role, Condition } from '@prisma/client';
+import config from '../config/settings.development.json';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Try to delete existing user, ignore if doesn't exist
-  try {
-    await prisma.user.delete({
-      where: { email: 'john@foo.com' },
-    });
-    console.log('Deleted existing user');
-  } catch (error) {
-    console.log('No existing user to delete');
+  await prisma.post.deleteMany({});
+  await prisma.stuff.deleteMany({});
+  await prisma.game.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  console.log('Seeding database...');
+
+  if (config.defaultUsers) {
+    await Promise.all(
+      config.defaultUsers.map(async (user) => {
+        console.log(`➡️  Creating user: ${user.email}`);
+
+        return prisma.user.upsert({
+          where: { id: user.id },
+          update: {},
+          create: {
+            id: user.id,
+            email: user.email,
+            password: user.password, // already hashed
+            role: (user.role as Role) || Role.USER,
+            username: user.username,
+            bio: user.bio,
+            profileImage: user.profileImage,
+            followers: user.followers,
+            following: user.following,
+            gameInterests: user.gameInterests || [],
+            gameTags: user.gameTags || [],
+            createdAt: new Date(user.createdAt),
+            updatedAt: new Date(user.updatedAt),
+          },
+        });
+      }),
+    );
   }
 
-  // Hash the password
-  const hashedPassword = await hash('changeme', 10);
+  if (config.defaultData) {
+    await Promise.all(
+      config.defaultData.map((item, index) => {
+        console.log(`Adding stuff: ${item.name}`);
 
-  // Create a sample user
-  const user = await prisma.user.create({
-    data: {
-      email: 'john@foo.com',
-      password: hashedPassword, // Now it's properly hashed!
-      username: 'JohnGamer123',
-      bio: 'Casual gamer looking to connect with others who enjoy competitive FPS games and RPGs. '
-      + 'Always down for a good co-op session! Been gaming since 2010 and love discovering new indie titles.',
-      gameInterests: ['Valorant', 'League of Legends', 'Elden Ring', 'Minecraft', 'Apex Legends'],
-      gameTags: ['FPS', 'RPG', 'Competitive', 'Co-op', 'Strategy'],
-      followers: 42,
-      following: 56,
-    },
-  });
+        return prisma.stuff.upsert({
+          where: { id: index + 1 },
+          update: {},
+          create: {
+            name: item.name,
+            quantity: item.quantity,
+            owner: item.owner,
+            condition: (item.condition as Condition) || Condition.good,
+          },
+        });
+      }),
+    );
+  }
 
-  console.log('Created user:', user);
+  if (config.defaultGames) {
+    await Promise.all(
+      config.defaultGames.map((game) => {
+        console.log(`Creating game: ${game.name}`);
+
+        return prisma.game.upsert({
+          where: { id: game.id },
+          update: {},
+          create: {
+            id: game.id,
+            name: game.name,
+            description: game.description,
+            picture: game.picture,
+          },
+        });
+      }),
+    );
+  }
+
+  if (config.defaultPosts) {
+    await Promise.all(
+      config.defaultPosts.map((post) => {
+        console.log(`Creating post: ${post.id}`);
+
+        return prisma.post.upsert({
+          where: { id: post.id },
+          update: {},
+          create: {
+            id: post.id,
+            content: post.content,
+            tags: post.tags || [],
+            userID: post.userID,
+            gameID: post.gameID,
+            createdAt: new Date(post.createdAt),
+          },
+        });
+      }),
+    );
+  }
+
+  console.log('Database seeded successfully!');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
+  .then(() => prisma.$disconnect())
+  .catch(async (e) => {
+    console.error('❌ Seed failed:', e);
     await prisma.$disconnect();
+    process.exit(1);
   });
