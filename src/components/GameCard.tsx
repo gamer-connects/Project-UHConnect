@@ -55,9 +55,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
             display: 'block',
           }}
           onError={(e) => {
-            // fallback icon if image fails
-            e.currentTarget.src =
-              'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
+            e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
           }}
         />
       </div>

@@ -45,7 +45,9 @@ export default function HomeEvent({ event }: { event: EventType }) {
           className="mb-2"
           style={{ color: '#b3b3b3', fontSize: '0.9rem' }}
         >
-          {event.date} @ {event.location}
+          {event.date}
+          {' @ '}
+          {event.location}
         </Card.Subtitle>
 
         {/* Description */}

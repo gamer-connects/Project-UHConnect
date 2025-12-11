@@ -5,9 +5,7 @@ import { Form, Button, Card } from 'react-bootstrap';
 import swal from 'sweetalert';
 
 export default function AdminPage() {
-  // ======================
   // GAME STATE
-  // ======================
   const [game, setGame] = useState({
     title: '',
     type: '',
@@ -15,9 +13,7 @@ export default function AdminPage() {
     description: '',
   });
 
-  // ======================
-  // EVENT STATE (Matches Prisma)
-  // ======================
+  // EVENT STATE
   const [event, setEvent] = useState({
     title: '',
     flyer: '',
@@ -27,9 +23,7 @@ export default function AdminPage() {
     description: '',
   });
 
-  // ======================
   // SUBMIT GAME
-  // ======================
   const submitGame = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -49,9 +43,7 @@ export default function AdminPage() {
     }
   };
 
-  // ======================
   // SUBMIT EVENT
-  // ======================
   const submitEvent = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -78,9 +70,6 @@ export default function AdminPage() {
     }
   };
 
-  // ======================
-  // UI
-  // ======================
   return (
     <main className="page-content" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
       <div style={{ maxWidth: '750px', margin: '0 auto' }}>
@@ -106,7 +95,7 @@ export default function AdminPage() {
             UH Connect Admin Panel
           </h2>
 
-          {/* ================= ADD GAME ================= */}
+          {/* ADD GAME */}
           <section>
             <h4 style={{ color: '#76b900', fontWeight: 600 }}>Add New Game</h4>
 
@@ -156,9 +145,7 @@ export default function AdminPage() {
                   as="textarea"
                   rows={3}
                   value={game.description}
-                  onChange={(e) =>
-                    setGame({ ...game, description: e.target.value })
-                  }
+                  onChange={(e) => setGame({ ...game, description: e.target.value })}
                   style={{ background: '#1a1a1a', color: '#fff' }}
                 />
               </Form.Group>
@@ -171,7 +158,7 @@ export default function AdminPage() {
 
           <hr style={{ borderColor: '#2d2d2d', margin: '35px 0' }} />
 
-          {/* ================= CREATE EVENT ================= */}
+          {/* CREATE EVENT */}
           <section>
             <h4 style={{ color: '#76b900', fontWeight: 600 }}>Create Gaming Event</h4>
 
@@ -243,9 +230,7 @@ export default function AdminPage() {
                   as="textarea"
                   rows={3}
                   value={event.description}
-                  onChange={(e) =>
-                    setEvent({ ...event, description: e.target.value })
-                  }
+                  onChange={(e) => setEvent({ ...event, description: e.target.value })}
                   style={{ background: '#1a1a1a', color: '#fff' }}
                 />
               </Form.Group>
