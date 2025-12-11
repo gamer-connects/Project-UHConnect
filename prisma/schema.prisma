@@ -6,8 +6,8 @@ generator client {
 
 datasource db {
   provider    = "postgresql"
-  url         = env("UHCDB_POSTGRES_PRISMA_URL")
-  directUrl   = env("UHCDB_POSTGRES_URL_NON_POOLING") // for Prisma Studio / sensitive queries
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
@@ -24,6 +24,26 @@ model User {
   gameTags      String[] // e.g. ["FPS", "Co-op", "Competitive"]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  posts         Post[]
+}
+
+model Game {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  picture     String
+  posts       Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  content   String
+  tags      String[]
+  user      User     @relation(fields: [userID], references: [id])
+  userID    Int
+  game      Game     @relation(fields: [gameID], references: [id])
+  gameID    Int
+  createdAt DateTime @default(now())
 }
 
 model Stuff {

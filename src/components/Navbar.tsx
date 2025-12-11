@@ -27,6 +27,9 @@ const NavBar: React.FC = () => {
             <Nav.Link id="home-nav" href="/home" key="home" active={pathName === '/'}>
               Home
             </Nav.Link>
+            <Nav.Link id="games-nav" href="/games" key="games" active={pathName === '/games'}>
+              Games
+            </Nav.Link>
 
             {currentUser
               ? [

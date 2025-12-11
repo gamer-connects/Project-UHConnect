@@ -1,13 +1,90 @@
 {
-  "defaultAccounts": [
-    { "email": "admin@foo.com", "password": "changeme", "role": "ADMIN" },
-    { "email": "john@foo.com", "password": "changeme" }
-  ],
-
   "defaultData": [
     { "name": "Basket", "quantity": 3, "owner": "john@foo.com", "condition": "excellent" },
     { "name": "Bicycle", "quantity": 2, "owner": "john@foo.com", "condition": "poor" },
     { "name": "Banana", "quantity": 2, "owner": "admin@foo.com", "condition": "good" },
     { "name": "Boogie Board", "quantity": 2, "owner": "admin@foo.com", "condition": "excellent" }
+  ],
+  "defaultUsers": [
+    {
+      "id": 10,
+      "email": "player1@example.com",
+      "password": "$2a$10$DEV_PASSWORD_HASH_1",
+      "role": "USER",
+      "username": "ShadowWolf",
+      "bio": "Competitive FPS player. Loves strategy games and late-night ranked.",
+      "profileImage": "/profile.png",
+      "followers": 12,
+      "following": 5,
+      "gameInterests": ["Valorant", "Apex Legends", "Overwatch 2"],
+      "gameTags": ["FPS", "Competitive", "Team Player"],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 11,
+      "email": "player2@example.com",
+      "password": "$2a$10$DEV_PASSWORD_HASH_2",
+      "role": "USER",
+      "username": "PixelMage",
+      "bio": "RPG enjoyer and part-time designer. Always grinding XP.",
+      "profileImage": "/profile.png",
+      "followers": 8,
+      "following": 20,
+      "gameInterests": ["Genshin Impact", "Elden Ring", "Hades"],
+      "gameTags": ["RPG", "Adventure", "Solo"],
+      "createdAt": "2024-02-02T13:37:00.000Z",
+      "updatedAt": "2024-02-02T13:37:00.000Z"
+    }
+  ],
+
+  "defaultGames": [
+    {
+      "id": 1,
+      "name": "Minecraft",
+      "description": "A sandbox survival game focused on creativity, exploration, and building in a block-based world.",
+      "picture": "/games/minecraft.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Valorant",
+      "description": "A tactical 5v5 shooter combining precise gunplay with unique agent abilities.",
+      "picture": "/games/valorant.jpg"
+    }
+  ],
+
+  "defaultPosts": [
+    {
+      "id": 1,
+      "content": "Just built my first mega-base in Minecraft. Took me all night but totally worth it!",
+      "userID": 10,
+      "gameID": 1,
+      "tags": ["minecraft", "builds", "survival"],
+      "createdAt": "2024-03-01T12:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "content": "Finally hit Diamond in Valorant! Chamber is still insane.",
+      "userID": 11,
+      "gameID": 2,
+      "tags": ["valorant", "ranked", "competitive"],
+      "createdAt": "2024-03-02T15:45:00.000Z"
+    },
+    {
+      "id": 3,
+      "content": "Started a Minecraft hardcore world today. Let's hope I survive longer than 5 minutes.",
+      "userID": 11,
+      "gameID": 1,
+      "tags": ["minecraft", "hardcore"],
+      "createdAt": "2024-03-03T09:30:00.000Z"
+    },
+    {
+      "id": 4,
+      "content": "My new Valorant montage is almost ready. Need clips for the intro though!",
+      "userID": 10,
+      "gameID": 2,
+      "tags": ["valorant", "montage", "editing"],
+      "createdAt": "2024-03-04T18:20:00.000Z"
+    }
   ]
 }

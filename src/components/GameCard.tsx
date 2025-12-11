@@ -1,15 +1,17 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from 'react-bootstrap';
 
 interface GameCardProps {
-  title: string;
-  image: string;
+  name: string;
+  picture: string;
   href: string;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
+const GameCard: React.FC<GameCardProps> = ({ name, picture, href }) => (
   <Link href={href} style={{ textDecoration: 'none' }}>
     <Card
       className="shadow-sm"
@@ -42,24 +44,19 @@ const GameCard: React.FC<GameCardProps> = ({ title, image, href }) => (
         }}
       >
         <Image
-          src={image}
-          alt={title}
+          src={picture}
+          alt={name}
           fill
-          style={{
-            objectFit: 'contain',
-          }}
+          style={{ objectFit: 'contain' }}
         />
       </div>
 
       <Card.Body className="text-center" style={{ backgroundColor: '#1a1a1a' }}>
         <Card.Title
           className="fw-bold fs-5"
-          style={{
-            color: '#76b900',
-            textShadow: '0 0 10px rgba(118, 185, 0, 0.3)',
-          }}
+          style={{ color: '#76b900', textShadow: '0 0 10px rgba(118, 185, 0, 0.3)' }}
         >
-          {title}
+          {name}
         </Card.Title>
       </Card.Body>
     </Card>

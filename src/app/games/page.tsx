@@ -1,23 +1,12 @@
-'use client';
-
-import React from 'react';
 import GameCard from '@/components/GameCard';
 import { Container, Row, Col } from 'react-bootstrap';
+import { prisma } from '@/lib/prisma';
 
-const games = [
-  {
-    title: 'Minecraft',
-    image: '/games/minecraft.jpg',
-    href: '/games/minecraft',
-  },
-  {
-    title: 'Valorant',
-    image: '/games/valorant.jpg',
-    href: '/games/valorant',
-  },
-];
+export default async function GamesPage() {
+  const games = await prisma.game.findMany({
+    orderBy: { name: 'asc' },
+  });
 
-export default function GamesPage() {
   return (
     <div
       style={{
@@ -27,19 +16,20 @@ export default function GamesPage() {
         position: 'relative',
       }}
     >
-      {/* Background glow effects */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: `
-          radial-gradient(circle at 30% 20%, rgba(118, 185, 0, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 70% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
-        `,
-        pointerEvents: 'none',
-      }}
+      {/* Background glow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 30% 20%, rgba(118, 185, 0, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 70% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+        }}
       />
 
       <Container className="py-5" style={{ position: 'relative', zIndex: 1 }}>
@@ -56,11 +46,11 @@ export default function GamesPage() {
 
         <Row className="g-4" xs={1} sm={2} md={3} lg={4}>
           {games.map((game) => (
-            <Col key={game.title} className="d-flex justify-content-center">
+            <Col key={game.id} className="d-flex justify-content-center">
               <GameCard
-                title={game.title}
-                image={game.image}
-                href={game.href}
+                name={game.name}
+                picture={game.picture}
+                href={`/games/${encodeURIComponent(game.name.toLowerCase().replace(/\s+/g, '-'))}`}
               />
             </Col>
           ))}
