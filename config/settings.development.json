@@ -37,22 +37,22 @@
       "updatedAt": "2024-02-02T13:37:00.000Z"
     }
   ],
-
   "defaultGames": [
     {
       "id": 1,
-      "name": "Minecraft",
-      "description": "A sandbox survival game focused on creativity, exploration, and building in a block-based world.",
-      "picture": "/games/minecraft.jpg"
+      "title": "Minecraft",
+      "type": "Sandbox",
+      "image": "/games/minecraft.jpg",
+      "description": "A sandbox survival game focused on creativity, exploration, and building in a block-based world."
     },
     {
       "id": 2,
-      "name": "Valorant",
-      "description": "A tactical 5v5 shooter combining precise gunplay with unique agent abilities.",
-      "picture": "/games/valorant.jpg"
+      "title": "Valorant",
+      "type": "FPS",
+      "image": "/games/valorant.jpg",
+      "description": "A tactical 5v5 shooter combining precise gunplay with unique agent abilities."
     }
   ],
-
   "defaultPosts": [
     {
       "id": 1,

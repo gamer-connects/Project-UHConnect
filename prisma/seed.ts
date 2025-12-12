@@ -15,14 +15,13 @@ async function main() {
     await Promise.all(
       config.defaultUsers.map(async (user) => {
         console.log(`➡️  Creating user: ${user.email}`);
-
         return prisma.user.upsert({
           where: { id: user.id },
           update: {},
           create: {
             id: user.id,
             email: user.email,
-            password: user.password, // already hashed
+            password: user.password,
             role: (user.role as Role) || Role.USER,
             username: user.username,
             bio: user.bio,
@@ -43,7 +42,6 @@ async function main() {
     await Promise.all(
       config.defaultData.map((item, index) => {
         console.log(`Adding stuff: ${item.name}`);
-
         return prisma.stuff.upsert({
           where: { id: index + 1 },
           update: {},
@@ -61,16 +59,16 @@ async function main() {
   if (config.defaultGames) {
     await Promise.all(
       config.defaultGames.map((game) => {
-        console.log(`Creating game: ${game.name}`);
-
+        console.log(`Creating game: ${game.title}`);
         return prisma.game.upsert({
           where: { id: game.id },
           update: {},
           create: {
             id: game.id,
-            name: game.name,
+            title: game.title,
+            type: game.type,
+            image: game.image,
             description: game.description,
-            picture: game.picture,
           },
         });
       }),
@@ -81,7 +79,6 @@ async function main() {
     await Promise.all(
       config.defaultPosts.map((post) => {
         console.log(`Creating post: ${post.id}`);
-
         return prisma.post.upsert({
           where: { id: post.id },
           update: {},
