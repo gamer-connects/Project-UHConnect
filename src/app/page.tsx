@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { PeopleFill, CalendarEvent, ChatHeartFill } from 'react-bootstrap-icons';
 import Image from 'next/image';
-import authOptions from '@/lib/authOptions';
+import { authOptions } from '@/lib/authOptions';
 import './landing.css';
 
 /** The Home/Landing page. Redirects logged-in users to /home */

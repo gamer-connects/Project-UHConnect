@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth';
-import authOptions from '@/lib/authOptions';
+import { authOptions } from '@/lib/authOptions';
 import { loggedInProtectedPage } from '@/lib/page-protection';
 import AddStuffForm from '@/components/AddStuffForm';
 
