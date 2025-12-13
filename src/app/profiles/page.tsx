@@ -8,6 +8,12 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface Game {
+  id: number;
+  title: string;
+  name?: string; // fallback if API uses 'name'
+}
+
 interface UserProfile {
   id: number;
   username: string;
@@ -16,20 +22,20 @@ interface UserProfile {
   profileImage: string | null;
   followers: number;
   following: number;
-  gameInterestIds: string[];
+  gameInterestIds: number[]; // Changed from string[] to number[]
   gameTags: string[];
 }
 
 const ProfilePage = () => {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (status === 'loading') return;
-
       if (!session?.user?.id) {
         setError('Please log in to view your profile');
         setLoading(false);
@@ -37,20 +43,34 @@ const ProfilePage = () => {
       }
 
       try {
-        const res = await fetch(`/api/profile/${session.user.id}`);
-        if (!res.ok) throw new Error('Failed to fetch profile');
-        const data: UserProfile = await res.json();
-        setProfile(data);
+        // Fetch profile
+        const profileRes = await fetch(`/api/profile/${session.user.id}`);
+        if (!profileRes.ok) throw new Error('Failed to fetch profile');
+        const profileData: UserProfile = await profileRes.json();
+
+        // Fetch games list
+        const gamesRes = await fetch('/api/games');
+        if (!gamesRes.ok) throw new Error('Failed to fetch games');
+        const gamesData: Game[] = await gamesRes.json();
+
+        setProfile(profileData);
+        setGames(gamesData);
       } catch (err) {
         console.error(err);
-        setError('Failed to load profile');
+        setError('Failed to load profile or games');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [session, status]);
+
+  // Helper: Convert game ID to title
+  const getGameTitle = (gameId: number) => {
+    const game = games.find(g => g.id === gameId);
+    return game?.title || game?.name || `Game #${gameId}`;
+  };
 
   // Loading State
   if (loading || status === 'loading') {
@@ -129,7 +149,6 @@ const ProfilePage = () => {
         position: 'relative',
       }}
     >
-      {/* Subtle glowing background */}
       <div
         style={{
           position: 'absolute',
@@ -144,7 +163,6 @@ const ProfilePage = () => {
           pointerEvents: 'none',
         }}
       />
-
       <Container id="profile-page" className="py-4" style={{ position: 'relative', zIndex: 1 }}>
         {/* Profile Header */}
         <Row className="justify-content-center mb-4">
@@ -242,7 +260,7 @@ const ProfilePage = () => {
           </Col>
         </Row>
 
-        {/* Game Interests */}
+        {/* Game Interests - Now shows titles! */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
             <Card
@@ -259,9 +277,9 @@ const ProfilePage = () => {
                 </h4>
                 <div className="d-flex flex-wrap gap-2">
                   {profile.gameInterestIds.length > 0 ? (
-                    profile.gameInterestIds.map((game) => (
+                    profile.gameInterestIds.map((gameId) => (
                       <Badge
-                        key={game}
+                        key={gameId}
                         style={{
                           background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
                           padding: '0.5rem 1rem',
@@ -273,7 +291,7 @@ const ProfilePage = () => {
                           border: 'none',
                         }}
                       >
-                        {game}
+                        {getGameTitle(gameId)}
                       </Badge>
                     ))
                   ) : (
