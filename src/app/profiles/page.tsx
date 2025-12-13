@@ -1,335 +1,272 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
-import {
-  Col, Container, Row, Card, Badge, Button, Spinner,
-} from 'react-bootstrap';
-import Image from 'next/image';
-import Link from 'next/link';
+import { Container, Spinner, Form, Button, Alert, Row, Col } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface UserProfile {
+interface Game {
   id: number;
-  username: string;
-  email: string;
-  bio: string | null;
-  profileImage: string | null;
-  followers: number;
-  following: number;
-  gameInterestIds: string[];
-  gameTags: string[];
+  title: string;
+  type: string;
+  image: string;
+  name?: string; // Fallback in case API uses 'name' instead
 }
 
-const ProfilePage = () => {
+// Predefined gaming preference tags
+const GAMING_TAGS = [
+  'Competitive',
+  'Casual',
+  'Team Player',
+  'Solo Player',
+  'Strategy',
+  'Action',
+  'RPG Fan',
+  'FPS Enthusiast',
+  'MOBA Player',
+  'Battle Royale',
+  'Co-op',
+  'PvP',
+  'PvE',
+  'Speedrunner',
+  'Achievement Hunter',
+  'Story-Driven',
+  'Multiplayer',
+  'Single Player',
+  'Streamer',
+  'Content Creator',
+];
+
+const EditProfilePage = () => {
   const { data: session, status } = useSession();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    username: '',
+    bio: '',
+    gameInterestIds: [] as number[],
+    gameTags: [] as string[],
+  });
+  const [availableGames, setAvailableGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchingProfile, setFetchingProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch available games and current profile data
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (status === 'loading') return;
-
       if (!session?.user?.id) {
-        setError('Please log in to view your profile');
-        setLoading(false);
+        setFetchingProfile(false);
         return;
       }
 
       try {
-        const res = await fetch(`/api/profile/${session.user.id}`);
-        if (!res.ok) throw new Error('Failed to fetch profile');
-        const data: UserProfile = await res.json();
-        setProfile(data);
+        // Fetch available games
+        const gamesResponse = await fetch('/api/games');
+        if (gamesResponse.ok) {
+          const games = await gamesResponse.json();
+          setAvailableGames(games);
+        }
+
+        // Fetch current profile
+        const profileResponse = await fetch(`/api/profile/${session.user.id}`);
+        if (!profileResponse.ok) throw new Error('Failed to fetch profile');
+        const data = await profileResponse.json();
+        setFormData({
+          username: data.username || '',
+          bio: data.bio || '',
+          gameInterestIds: data.gameInterestIds || [],
+          gameTags: data.gameTags || [],
+        });
       } catch (err) {
-        console.error(err);
-        setError('Failed to load profile');
+        console.error('Error fetching data:', err);
+        setError('Failed to load profile data');
       } finally {
-        setLoading(false);
+        setFetchingProfile(false);
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [session, status]);
 
-  // Loading State
-  if (loading || status === 'loading') {
+  const handleGameToggle = (gameId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gameInterestIds: prev.gameInterestIds.includes(gameId)
+        ? prev.gameInterestIds.filter(id => id !== gameId)
+        : [...prev.gameInterestIds, gameId],
+    }));
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setFormData(prev => ({
+      ...prev,
+      gameTags: prev.gameTags.includes(tag)
+        ? prev.gameTags.filter(t => t !== tag)
+        : [...prev.gameTags, tag],
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session?.user?.id) {
+      setError('User ID not found');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/profile/${session.user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          bio: formData.bio,
+          gameInterestIds: formData.gameInterestIds,
+          gameTags: formData.gameTags,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        let errorMessage = 'Failed to update profile';
+        try {
+          const data = JSON.parse(text);
+          errorMessage = data.error || errorMessage;
+        } catch (parseError) {
+          if (response.status === 404) {
+            errorMessage = 'API route not found';
+          } else {
+            errorMessage = `Server error (${response.status})`;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      router.push('/profiles');
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === 'loading' || fetchingProfile) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Spinner animation="border" style={{ color: '#76b900' }} />
-      </main>
+      <Container className="text-center py-5">
+        <Spinner animation="border" />
+        <p className="mt-3">Loading profile...</p>
+      </Container>
     );
   }
 
-  // Error / Not Logged In
-  if (error || !profile) {
+  if (!session) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-        }}
-      >
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `
-            radial-gradient(circle at 20% 30%, rgba(118, 185, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
-          `,
-          pointerEvents: 'none',
-        }}
-        />
-        <div className="text-center" style={{ zIndex: 1 }}>
-          <p style={{ color: '#b3b3b3', fontSize: '1.2rem' }}>
-            {error || 'Profile not found'}
-          </p>
-          {!session && (
-            <Button
-              href="/auth/signin"
-              style={{
-                background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                border: 'none',
-                padding: '0.7rem 2rem',
-                fontWeight: '700',
-                color: '#0d0d0d',
-                boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
-                marginTop: '1.5rem',
-              }}
-            >
-              Sign In
-            </Button>
-          )}
-        </div>
-      </main>
+      <Container className="text-center py-5">
+        <p>You must be logged in to edit your profile.</p>
+      </Container>
     );
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-        padding: '2rem 0',
-        position: 'relative',
-      }}
-    >
-      {/* Subtle glowing background */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `
-            radial-gradient(circle at 20% 30%, rgba(118, 185, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
-          `,
-          pointerEvents: 'none',
-        }}
-      />
+    <Container className="py-5" style={{ maxWidth: '800px' }}>
+      <h2 className="mb-4">Edit Profile</h2>
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
 
-      <Container id="profile-page" className="py-4" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Profile Header */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.3)',
-                border: '2px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <Row className="align-items-center">
-                  <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    <Image
-                      src={profile.profileImage || '/profile.png'}
-                      alt="Profile"
-                      width={150}
-                      height={150}
-                      className="rounded-circle"
-                      style={{
-                        objectFit: 'cover',
-                        border: '4px solid #76b900',
-                        boxShadow: '0 0 20px rgba(118, 185, 0, 0.5)',
-                      }}
-                    />
-                  </Col>
-                  <Col xs={12} md={9}>
-                    <h2
-                      style={{
-                        color: '#76b900',
-                        fontWeight: 'bold',
-                        textShadow: '0 0 10px rgba(118, 185, 0, 0.5)',
-                      }}
-                    >
-                      {profile.username}
-                    </h2>
-                    <p style={{ color: '#b3b3b3' }} className="mb-3">
-                      {profile.email}
-                    </p>
-                    <div className="d-flex gap-4 mb-3">
-                      <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#76b900' }}>{profile.followers}</strong>
-                        {' '}
-                        <span style={{ color: '#b3b3b3' }}>Followers</span>
-                      </div>
-                      <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#76b900' }}>{profile.following}</strong>
-                        {' '}
-                        <span style={{ color: '#b3b3b3' }}>Following</span>
-                      </div>
-                    </div>
-                    <Link href="/profiles/edit">
-                      <Button
-                        style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          border: 'none',
-                          padding: '0.5rem 1.5rem',
-                          fontWeight: '700',
-                          color: '#0d0d0d',
-                          boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
-                        }}
-                      >
-                        Edit Profile
-                      </Button>
-                    </Link>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+      <Form onSubmit={handleSubmit}>
+        {/* Username */}
+        <Form.Group className="mb-3">
+          <Form.Label>Username</Form.Label>
+          <Form.Control
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            disabled={loading}
+          />
+        </Form.Group>
 
-        {/* About Me */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  About Me
-                </h4>
-                <p style={{ color: '#b3b3b3', lineHeight: '1.6' }}>
-                  {profile.bio || 'No bio yet. Click Edit Profile to add one!'}
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+        {/* Bio */}
+        <Form.Group className="mb-4">
+          <Form.Label>Bio</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={formData.bio}
+            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+            disabled={loading}
+            placeholder="Tell us about yourself..."
+          />
+        </Form.Group>
 
         {/* Game Interests */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Game Interests
-                </h4>
-                <div className="d-flex flex-wrap gap-2">
-                  {profile.gameInterestIds.length > 0 ? (
-                    profile.gameInterestIds.map((game) => (
-                      <Badge
-                        key={game}
-                        style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          padding: '0.5rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          borderRadius: '20px',
-                          color: '#0d0d0d',
-                          boxShadow: '0 2px 10px rgba(118, 185, 0, 0.3)',
-                          border: 'none',
-                        }}
-                      >
-                        {game}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p style={{ color: '#666' }}>No game interests added yet</p>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+        <Form.Group className="mb-4">
+          <Form.Label className="mb-3">
+            <strong>Game Interests</strong>
+            (select all that apply)
+          </Form.Label>
+          <Row>
+            {availableGames.map((game) => (
+              <Col xs={6} md={4} key={game.id} className="mb-2">
+                <Form.Check
+                  type="checkbox"
+                  id={`game-${game.id}`}
+                  label={game.title || game.name || `Game ${game.id}`}
+                  checked={formData.gameInterestIds.includes(game.id)}
+                  onChange={() => handleGameToggle(game.id)}
+                  disabled={loading}
+                />
+              </Col>
+            ))}
+          </Row>
+          {availableGames.length === 0 && (
+            <p className="text-muted">No games available. Contact admin to add games.</p>
+          )}
+        </Form.Group>
 
         {/* Gaming Preferences */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Gaming Preferences
-                </h4>
-                <div className="d-flex flex-wrap gap-2">
-                  {profile.gameTags.length > 0 ? (
-                    profile.gameTags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          padding: '0.5rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          borderRadius: '20px',
-                          color: '#0d0d0d',
-                          boxShadow: '0 2px 10px rgba(118, 185, 0, 0.3)',
-                          border: 'none',
-                        }}
-                      >
-                        {tag}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p style={{ color: '#666' }}>No gaming preferences added yet</p>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </main>
+        <Form.Group className="mb-4">
+          <Form.Label className="mb-3">
+            <strong>Gaming Preferences</strong>
+            (select all that apply)
+          </Form.Label>
+          <Row>
+            {GAMING_TAGS.map((tag) => (
+              <Col xs={6} md={4} key={tag} className="mb-2">
+                <Form.Check
+                  type="checkbox"
+                  id={`tag-${tag}`}
+                  label={tag}
+                  checked={formData.gameTags.includes(tag)}
+                  onChange={() => handleTagToggle(tag)}
+                  disabled={loading}
+                />
+              </Col>
+            ))}
+          </Row>
+        </Form.Group>
+
+        {/* Buttons */}
+        <div className="d-flex gap-2">
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Saving...' : 'Save Changes'}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/profiles')}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Form>
+    </Container>
   );
 };
 
-export default ProfilePage;
+export default EditProfilePage;
