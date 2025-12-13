@@ -10,6 +10,7 @@ interface Game {
   title: string;
   type: string;
   image: string;
+  name?: string; // Fallback in case API uses 'name' instead
 }
 
 // Predefined gaming preference tags
@@ -215,7 +216,7 @@ const EditProfilePage = () => {
                 <Form.Check
                   type="checkbox"
                   id={`game-${game.id}`}
-                  label={game.title}
+                  label={game.title || game.name || `Game ${game.id}`}
                   checked={formData.gameInterestIds.includes(game.id)}
                   onChange={() => handleGameToggle(game.id)}
                   disabled={loading}
