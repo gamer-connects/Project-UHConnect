@@ -1,9 +1,10 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import { Container, Row, Col } from 'react-bootstrap';
+
+export const dynamic = 'force-dynamic';
 
 interface Game {
   id: number;

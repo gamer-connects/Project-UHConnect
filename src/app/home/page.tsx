@@ -1,11 +1,12 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import HomeEvent from '@/components/HomeEvent';
 import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
 import { EventType } from '@/types/event';
+
+export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
   // ===============================
