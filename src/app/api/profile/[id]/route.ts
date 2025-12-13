@@ -20,7 +20,7 @@ export async function GET(
         profileImage: true,
         followers: true,
         following: true,
-        gameInterests: true,
+        gameInterestIds: true,
         gameTags: true,
       },
     });
@@ -42,7 +42,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { username, bio, gameInterests, gameTags } = body;
+    const { username, bio, gameInterestIds, gameTags } = body;
 
     console.log('Updating user:', params.id);
     console.log('Body:', body);
@@ -52,7 +52,7 @@ export async function PUT(
       data: {
         username,
         bio,
-        gameInterests,
+        gameInterestIds,
         gameTags,
       },
     });

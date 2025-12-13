@@ -16,7 +16,7 @@ interface UserProfile {
   profileImage: string | null;
   followers: number;
   following: number;
-  gameInterests: string[];
+  gameInterestIds: string[];
   gameTags: string[];
 }
 
@@ -258,8 +258,8 @@ const ProfilePage = () => {
                   Game Interests
                 </h4>
                 <div className="d-flex flex-wrap gap-2">
-                  {profile.gameInterests.length > 0 ? (
-                    profile.gameInterests.map((game) => (
+                  {profile.gameInterestIds.length > 0 ? (
+                    profile.gameInterestIds.map((game) => (
                       <Badge
                         key={game}
                         style={{

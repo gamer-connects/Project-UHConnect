@@ -1,9 +1,40 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { Container, Spinner, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Spinner, Form, Button, Alert, Row, Col } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+interface Game {
+  id: number;
+  title: string;
+  type: string;
+  image: string;
+}
+
+// Predefined gaming preference tags
+const GAMING_TAGS = [
+  'Competitive',
+  'Casual',
+  'Team Player',
+  'Solo Player',
+  'Strategy',
+  'Action',
+  'RPG Fan',
+  'FPS Enthusiast',
+  'MOBA Player',
+  'Battle Royale',
+  'Co-op',
+  'PvP',
+  'PvE',
+  'Speedrunner',
+  'Achievement Hunter',
+  'Story-Driven',
+  'Multiplayer',
+  'Single Player',
+  'Streamer',
+  'Content Creator',
+];
 
 const EditProfilePage = () => {
   const { data: session, status } = useSession();
@@ -11,16 +42,17 @@ const EditProfilePage = () => {
   const [formData, setFormData] = useState({
     username: '',
     bio: '',
-    gameInterests: '',
-    gameTags: '',
+    gameInterestIds: [] as number[],
+    gameTags: [] as string[],
   });
+  const [availableGames, setAvailableGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingProfile, setFetchingProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch current profile data when page loads
+  // Fetch available games and current profile data
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const fetchData = async () => {
       if (status === 'loading') return;
       if (!session?.user?.id) {
         setFetchingProfile(false);
@@ -28,25 +60,51 @@ const EditProfilePage = () => {
       }
 
       try {
-        const response = await fetch(`/api/profile/${session.user.id}`);
-        if (!response.ok) throw new Error('Failed to fetch profile');
-        const data = await response.json();
+        // Fetch available games
+        const gamesResponse = await fetch('/api/games');
+        if (gamesResponse.ok) {
+          const games = await gamesResponse.json();
+          setAvailableGames(games);
+        }
+
+        // Fetch current profile
+        const profileResponse = await fetch(`/api/profile/${session.user.id}`);
+        if (!profileResponse.ok) throw new Error('Failed to fetch profile');
+        const data = await profileResponse.json();
         setFormData({
           username: data.username || '',
           bio: data.bio || '',
-          gameInterests: (data.gameInterests || []).join(', '),
-          gameTags: (data.gameTags || []).join(', '),
+          gameInterestIds: data.gameInterestIds || [],
+          gameTags: data.gameTags || [],
         });
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error('Error fetching data:', err);
         setError('Failed to load profile data');
       } finally {
         setFetchingProfile(false);
       }
     };
 
-    fetchProfileData();
+    fetchData();
   }, [session, status]);
+
+  const handleGameToggle = (gameId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gameInterestIds: prev.gameInterestIds.includes(gameId)
+        ? prev.gameInterestIds.filter(id => id !== gameId)
+        : [...prev.gameInterestIds, gameId],
+    }));
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setFormData(prev => ({
+      ...prev,
+      gameTags: prev.gameTags.includes(tag)
+        ? prev.gameTags.filter(t => t !== tag)
+        : [...prev.gameTags, tag],
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,47 +117,26 @@ const EditProfilePage = () => {
     setError(null);
 
     try {
-      console.log('Sending PUT request to:', `/api/profile/${session.user.id}`);
-      console.log('With data:', {
-        username: formData.username,
-        bio: formData.bio,
-        gameInterests: formData.gameInterests.split(',').map((s) => s.trim()).filter((s) => s.length > 0),
-        gameTags: formData.gameTags.split(',').map((s) => s.trim()).filter((s) => s.length > 0),
-      });
-
       const response = await fetch(`/api/profile/${session.user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formData.username,
           bio: formData.bio,
-          gameInterests: formData.gameInterests
-            .split(',')
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0),
-          gameTags: formData.gameTags
-            .split(',')
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0),
+          gameInterestIds: formData.gameInterestIds,
+          gameTags: formData.gameTags,
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response OK:', response.ok);
-
       if (!response.ok) {
-        // Get the response as text first
         const text = await response.text();
-        console.error('Error response text:', text);
-        // Try to parse as JSON, fallback to plain text error
         let errorMessage = 'Failed to update profile';
         try {
           const data = JSON.parse(text);
           errorMessage = data.error || errorMessage;
         } catch (parseError) {
-          // If it's a 404, the API route doesn't exist
           if (response.status === 404) {
-            errorMessage = 'API route not found. Make sure /api/profile/[id]/route.ts exists';
+            errorMessage = 'API route not found';
           } else {
             errorMessage = `Server error (${response.status})`;
           }
@@ -107,10 +144,6 @@ const EditProfilePage = () => {
         throw new Error(errorMessage);
       }
 
-      const result = await response.json();
-      console.log('Update successful:', result);
-
-      // Redirect to profile page
       router.push('/profiles');
     } catch (err) {
       console.error('Error updating profile:', err);
@@ -138,7 +171,7 @@ const EditProfilePage = () => {
   }
 
   return (
-    <Container className="py-5" style={{ maxWidth: '600px' }}>
+    <Container className="py-5" style={{ maxWidth: '800px' }}>
       <h2 className="mb-4">Edit Profile</h2>
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError(null)}>
@@ -147,6 +180,7 @@ const EditProfilePage = () => {
       )}
 
       <Form onSubmit={handleSubmit}>
+        {/* Username */}
         <Form.Group className="mb-3">
           <Form.Label>Username</Form.Label>
           <Form.Control
@@ -156,7 +190,8 @@ const EditProfilePage = () => {
           />
         </Form.Group>
 
-        <Form.Group className="mb-3">
+        {/* Bio */}
+        <Form.Group className="mb-4">
           <Form.Label>Bio</Form.Label>
           <Form.Control
             as="textarea"
@@ -164,29 +199,58 @@ const EditProfilePage = () => {
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             disabled={loading}
+            placeholder="Tell us about yourself..."
           />
         </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Game Interests (comma separated)</Form.Label>
-          <Form.Control
-            value={formData.gameInterests}
-            onChange={(e) => setFormData({ ...formData, gameInterests: e.target.value })}
-            disabled={loading}
-            placeholder="e.g., Valorant, League of Legends, Overwatch"
-          />
-        </Form.Group>
-
+        {/* Game Interests */}
         <Form.Group className="mb-4">
-          <Form.Label>Gaming Preferences (comma separated)</Form.Label>
-          <Form.Control
-            value={formData.gameTags}
-            onChange={(e) => setFormData({ ...formData, gameTags: e.target.value })}
-            disabled={loading}
-            placeholder="e.g., Competitive, Casual, Team Player"
-          />
+          <Form.Label className="mb-3">
+            <strong>Game Interests</strong>
+            (select all that apply)
+          </Form.Label>
+          <Row>
+            {availableGames.map((game) => (
+              <Col xs={6} md={4} key={game.id} className="mb-2">
+                <Form.Check
+                  type="checkbox"
+                  id={`game-${game.id}`}
+                  label={game.title}
+                  checked={formData.gameInterestIds.includes(game.id)}
+                  onChange={() => handleGameToggle(game.id)}
+                  disabled={loading}
+                />
+              </Col>
+            ))}
+          </Row>
+          {availableGames.length === 0 && (
+            <p className="text-muted">No games available. Contact admin to add games.</p>
+          )}
         </Form.Group>
 
+        {/* Gaming Preferences */}
+        <Form.Group className="mb-4">
+          <Form.Label className="mb-3">
+            <strong>Gaming Preferences</strong>
+            (select all that apply)
+          </Form.Label>
+          <Row>
+            {GAMING_TAGS.map((tag) => (
+              <Col xs={6} md={4} key={tag} className="mb-2">
+                <Form.Check
+                  type="checkbox"
+                  id={`tag-${tag}`}
+                  label={tag}
+                  checked={formData.gameTags.includes(tag)}
+                  onChange={() => handleTagToggle(tag)}
+                  disabled={loading}
+                />
+              </Col>
+            ))}
+          </Row>
+        </Form.Group>
+
+        {/* Buttons */}
         <div className="d-flex gap-2">
           <Button type="submit" disabled={loading}>
             {loading ? 'Saving...' : 'Save Changes'}

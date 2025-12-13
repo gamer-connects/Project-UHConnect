@@ -35,7 +35,7 @@ type User = {
   username: string;
   bio: string | null;
   profileImage: string | null;
-  gameInterests: string[];
+  gameInterestIds: string[];
   gameTags: string[];
   followers: number;
   following: number;
@@ -188,10 +188,10 @@ export default function UserSearch() {
                   </Card.Text>
                 )}
 
-                {user.gameInterests.length > 0 && (
+                {user.gameInterestIds.length > 0 && (
                   <div className="mb-3">
                     <div className="d-flex flex-wrap gap-2">
-                      {user.gameInterests.slice(0, 3).map((game) => (
+                      {user.gameInterestIds.slice(0, 3).map((game) => (
                         <Badge
                           key={game}
                           style={{
@@ -205,7 +205,7 @@ export default function UserSearch() {
                           {game}
                         </Badge>
                       ))}
-                      {user.gameInterests.length > 3 && (
+                      {user.gameInterestIds.length > 3 && (
                         <Badge
                           style={{
                             backgroundColor: '#2d2d2d',
@@ -215,7 +215,7 @@ export default function UserSearch() {
                           }}
                         >
                           +
-                          {user.gameInterests.length - 3}
+                          {user.gameInterestIds.length - 3}
                           {' '}
                           more
                         </Badge>
