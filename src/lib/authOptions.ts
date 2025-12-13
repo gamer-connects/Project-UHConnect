@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
           role: (user as any).role,
           profileImage: (user as any).profileImage,
           bio: (user as any).bio ?? null,
-          gameInterests: (user as any).gameInterests ?? [],
+          gameInterestIds: (user as any).gameInterestIds ?? [],
           gameTags: (user as any).gameTags ?? [],
         };
       }
@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
           role: token.role as string,
           profileImage: token.profileImage as string | null,
           bio: token.bio as string | null,
-          gameInterests: token.gameInterests as string[],
+          gameInterestIds: token.gameInterestIds as string[],
           gameTags: token.gameTags as string[],
         },
       };

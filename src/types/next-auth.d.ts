@@ -10,7 +10,7 @@ declare module 'next-auth' {
     role: string;
     profileImage: string | null;
     bio?: string | null;
-    gameInterests?: string[];
+    gameInterestIds?: int[];
     gameTags?: string[];
   }
 
@@ -22,7 +22,7 @@ declare module 'next-auth' {
       role: string;
       profileImage: string | null;
       bio?: string | null;
-      gameInterests?: string[];
+      gameInterestIds?: int[];
       gameTags?: string[];
     } & DefaultSession['user'];
   }
@@ -36,7 +36,7 @@ declare module 'next-auth/jwt' {
     role: string;
     profileImage: string | null;
     bio?: string | null;
-    gameInterests?: string[];
+    gameInterestIds?: int[];
     gameTags?: string[];
   }
 }

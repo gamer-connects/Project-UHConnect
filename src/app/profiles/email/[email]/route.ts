@@ -19,7 +19,7 @@ export async function GET(
         profileImage: true,
         followers: true,
         following: true,
-        gameInterests: true,
+        gameInterestIds: true,
         gameTags: true,
       },
     });
