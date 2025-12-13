@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import { Container, Row, Col } from 'react-bootstrap';
 
-export const dynamic = 'force-dynamic';
-
 interface Game {
   id: number;
   title: string;
@@ -17,12 +15,26 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/games')
-      .then((res) => res.json())
-      .then((data) => {
+    async function loadGames() {
+      try {
+        const res = await fetch('/api/games', {
+          cache: 'no-store',
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch games');
+        }
+
+        const data = await res.json();
         setGames(data);
+      } catch (error) {
+        console.error('Failed to load games:', error);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    loadGames();
   }, []);
 
   if (loading) {

@@ -6,8 +6,6 @@ import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
 import { EventType } from '@/types/event';
 
-export const dynamic = 'force-dynamic';
-
 export default function HomePage() {
   // ===============================
   // STATE FOR EVENTS
@@ -16,12 +14,19 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   // ===============================
-  // FETCH EVENTS FROM API
+  // FETCH EVENTS FROM API (NO CACHE)
   // ===============================
   useEffect(() => {
     async function loadEvents() {
       try {
-        const res = await fetch('/api/events');
+        const res = await fetch('/api/events', {
+          cache: 'no-store',
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch events');
+        }
+
         const data = await res.json();
         setEvents(data);
       } catch (error) {
@@ -140,21 +145,18 @@ export default function HomePage() {
                 Events
               </h2>
 
-              {/* Loading Spinner */}
               {loading && (
                 <p className="text-center" style={{ color: '#aaa' }}>
                   Loading events...
                 </p>
               )}
 
-              {/* No Events */}
               {!loading && events.length === 0 && (
                 <p className="text-center" style={{ color: '#aaa' }}>
                   No events yet.
                 </p>
               )}
 
-              {/* Render Events */}
               {events.map((event) => (
                 <HomeEvent key={event.id} event={event} />
               ))}
