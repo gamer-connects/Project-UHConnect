@@ -9,12 +9,11 @@ import { BoxArrowRight, Lock, PersonFill, PersonPlusFill } from 'react-bootstrap
 
 const NavBar: React.FC = () => {
   const { data: session } = useSession();
-  const currentUser = session?.user?.email;
-  const userWithRole = session?.user
-  ? { email: session.user.email!, randomKey: (session.user as any).randomKey }
-  : null;
-  const role = userWithRole?.randomKey;
   const pathName = usePathname();
+
+  // User data
+  const currentUser = session?.user?.email ?? null;
+  const role = session?.user?.role ?? null; // <-- FIXED: get role directly
 
   return (
     <Navbar expand="lg" className="navbar-custom">
@@ -22,69 +21,89 @@ const NavBar: React.FC = () => {
         <Navbar.Brand href="/" className="navbar-brand-custom">
           <strong>UH Connect</strong>
         </Navbar.Brand>
+
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto justify-content-start">
-            {/* Always show Home */}
-            <Nav.Link id="home-nav" href="/home" key="home" active={pathName === '/'}>
+
+            {/* Home */}
+            <Nav.Link id="home-nav" href="/home" active={pathName === '/home'}>
               Home
             </Nav.Link>
-            <Nav.Link id="games-nav" href="/games" key="games" active={pathName === '/games'}>
+
+            {/* Games */}
+            <Nav.Link id="games-nav" href="/games" active={pathName === '/games'}>
               Games
             </Nav.Link>
 
-            {currentUser
-              ? [
-                  <Nav.Link id="profile-nav" href="/profiles" key="profile" active={pathName === '/profiles'}>
-                    Profile
-                  </Nav.Link>,
-                  <Nav.Link
-                    id="user-search-nav"
-                    href="/usersearch"
-                    key="user-search"
-                    active={pathName === '/user-search'}
-                  >
-                    User Search
-                  </Nav.Link>,
-                  <Nav.Link
-                    id="request-event-nav"
-                    href="/request-event"
-                    key="request-event"
-                    active={pathName === '/request-event'}
-                  >
-                    Request Event
-                  </Nav.Link>,
-                ]
-              : ''}
-            {currentUser && role === 'ADMIN' ? (
-              <Nav.Link id="admin-stuff-nav" href="/admin" key="admin" active={pathName === '/admin'}>
+            {/* Logged-in user menu */}
+            {currentUser && (
+              <>
+                <Nav.Link
+                  id="profile-nav"
+                  href="/profiles"
+                  active={pathName === '/profiles'}
+                >
+                  Profile
+                </Nav.Link>
+
+                <Nav.Link
+                  id="user-search-nav"
+                  href="/usersearch"
+                  active={pathName === '/usersearch'}
+                >
+                  User Search
+                </Nav.Link>
+
+                <Nav.Link
+                  id="request-event-nav"
+                  href="/request-event"
+                  active={pathName === '/request-event'}
+                >
+                  Request Event
+                </Nav.Link>
+              </>
+            )}
+
+            {/* ADMIN ONLY */}
+            {currentUser && role === 'ADMIN' && (
+              <Nav.Link
+                id="admin-stuff-nav"
+                href="/admin"
+                active={pathName === '/admin'}
+              >
                 Admin
               </Nav.Link>
-            ) : (
-              ''
             )}
           </Nav>
+
           <Nav>
             {session ? (
               <NavDropdown id="login-dropdown" title={currentUser}>
                 <NavDropdown.Item id="login-dropdown-sign-out" href="/api/auth/signout">
                   <BoxArrowRight />
-                  Sign Out
+{' '}
+Sign Out
                 </NavDropdown.Item>
+
                 <NavDropdown.Item id="login-dropdown-change-password" href="/auth/change-password">
                   <Lock />
-                  Change Password
+{' '}
+Change Password
                 </NavDropdown.Item>
               </NavDropdown>
             ) : (
               <NavDropdown id="login-dropdown" title="Login">
                 <NavDropdown.Item id="login-dropdown-sign-in" href="/auth/signin">
                   <PersonFill />
-                  Sign in
+{' '}
+Sign in
                 </NavDropdown.Item>
+
                 <NavDropdown.Item id="login-dropdown-sign-up" href="/auth/signup">
                   <PersonPlusFill />
-                  Sign up
+{' '}
+Sign up
                 </NavDropdown.Item>
               </NavDropdown>
             )}
