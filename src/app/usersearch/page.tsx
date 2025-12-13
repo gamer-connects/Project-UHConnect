@@ -35,18 +35,42 @@ type User = {
   username: string;
   bio: string | null;
   profileImage: string | null;
-  gameInterestIds: string[];
+  gameInterestIds: number[]; // Changed from string[] to number[]
   gameTags: string[];
   followers: number;
   following: number;
   role: string;
 };
 
+type Game = {
+  id: number;
+  title: string;
+  type: string;
+  image: string;
+};
+
 export default function UserSearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [allGames, setAllGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch all games on mount
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await fetch('/api/games');
+        if (response.ok) {
+          const gamesData = await response.json();
+          setAllGames(gamesData);
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
+      }
+    };
+    fetchGames();
+  }, []);
 
   // Define handleSearch before using it
   const handleSearch = async () => {
@@ -76,6 +100,11 @@ export default function UserSearch() {
       handleSearch();
     }
   };
+
+  // Get game titles from IDs
+  const getGameTitles = (gameIds: number[]): string[] => gameIds
+    .map(id => allGames.find(game => game.id === id)?.title)
+    .filter(Boolean) as string[];
 
   // Helper function to get the results title
   const getResultsTitle = () => {
@@ -114,165 +143,168 @@ export default function UserSearch() {
 
     return (
       <Row className="g-4">
-        {users.map((user) => (
-          <Col key={user.id} md={6} lg={12} xl={6}>
-            <Card
-              style={{
-                backgroundColor: '#1a1a1a',
-                border: '2px solid #76b900',
-                boxShadow: '0 4px 16px rgba(118, 185, 0, 0.2)',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(118, 185, 0, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(118, 185, 0, 0.2)';
-              }}
-            >
-              <Card.Body>
-                <div className="d-flex align-items-start mb-3">
-                  <Image
-                    src={user.profileImage || '/profile.png'}
-                    alt={user.username}
-                    width={60}
-                    height={60}
-                    className="rounded-circle"
-                    style={{
-                      objectFit: 'cover',
-                      border: '3px solid #76b900',
-                      marginRight: '1rem',
-                    }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <Card.Title
-                      className="mb-1"
+        {users.map((user) => {
+          const userGameTitles = getGameTitles(user.gameInterestIds);
+          return (
+            <Col key={user.id} md={6} lg={12} xl={6}>
+              <Card
+                style={{
+                  backgroundColor: '#1a1a1a',
+                  border: '2px solid #76b900',
+                  boxShadow: '0 4px 16px rgba(118, 185, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(118, 185, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(118, 185, 0, 0.2)';
+                }}
+              >
+                <Card.Body>
+                  <div className="d-flex align-items-start mb-3">
+                    <Image
+                      src={user.profileImage || '/profile.png'}
+                      alt={user.username}
+                      width={60}
+                      height={60}
+                      className="rounded-circle"
                       style={{
-                        color: '#76b900',
-                        fontSize: '1.2rem',
-                        fontWeight: 'bold',
+                        objectFit: 'cover',
+                        border: '3px solid #76b900',
+                        marginRight: '1rem',
+                      }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <Card.Title
+                        className="mb-1"
+                        style={{
+                          color: '#76b900',
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {user.username}
+                      </Card.Title>
+                      <Card.Text style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
+                        {user.email}
+                      </Card.Text>
+                      <div className="d-flex gap-3 mb-2">
+                        <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
+                          <strong style={{ color: '#76b900' }}>{user.followers}</strong>
+                          {' '}
+                          Followers
+                        </span>
+                        <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
+                          <strong style={{ color: '#76b900' }}>{user.following}</strong>
+                          {' '}
+                          Following
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {user.bio && (
+                    <Card.Text
+                      className="mb-3"
+                      style={{
+                        color: '#b3b3b3',
+                        fontSize: '0.9rem',
+                        lineHeight: '1.5',
                       }}
                     >
-                      {user.username}
-                    </Card.Title>
-                    <Card.Text style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
-                      {user.email}
+                      {user.bio.length > 100 ? `${user.bio.substring(0, 100)}...` : user.bio}
                     </Card.Text>
-                    <div className="d-flex gap-3 mb-2">
-                      <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
-                        <strong style={{ color: '#76b900' }}>{user.followers}</strong>
-                        {' '}
-                        Followers
-                      </span>
-                      <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
-                        <strong style={{ color: '#76b900' }}>{user.following}</strong>
-                        {' '}
-                        Following
-                      </span>
+                  )}
+
+                  {userGameTitles.length > 0 && (
+                    <div className="mb-3">
+                      <div className="d-flex flex-wrap gap-2">
+                        {userGameTitles.slice(0, 3).map((game) => (
+                          <Badge
+                            key={game}
+                            style={{
+                              background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                              color: '#0d0d0d',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                            }}
+                          >
+                            {game}
+                          </Badge>
+                        ))}
+                        {userGameTitles.length > 3 && (
+                          <Badge
+                            style={{
+                              backgroundColor: '#2d2d2d',
+                              color: '#76b900',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            +
+                            {userGameTitles.length - 3}
+                            {' '}
+                            more
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  )}
 
-                {user.bio && (
-                  <Card.Text
-                    className="mb-3"
-                    style={{
-                      color: '#b3b3b3',
-                      fontSize: '0.9rem',
-                      lineHeight: '1.5',
-                    }}
-                  >
-                    {user.bio.length > 100 ? `${user.bio.substring(0, 100)}...` : user.bio}
-                  </Card.Text>
-                )}
-
-                {user.gameInterestIds.length > 0 && (
-                  <div className="mb-3">
-                    <div className="d-flex flex-wrap gap-2">
-                      {user.gameInterestIds.slice(0, 3).map((game) => (
-                        <Badge
-                          key={game}
-                          style={{
-                            background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                            color: '#0d0d0d',
-                            padding: '0.3rem 0.6rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                          }}
-                        >
-                          {game}
-                        </Badge>
-                      ))}
-                      {user.gameInterestIds.length > 3 && (
-                        <Badge
-                          style={{
-                            backgroundColor: '#2d2d2d',
-                            color: '#76b900',
-                            padding: '0.3rem 0.6rem',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          +
-                          {user.gameInterestIds.length - 3}
-                          {' '}
-                          more
-                        </Badge>
-                      )}
+                  {user.gameTags.length > 0 && (
+                    <div className="mb-3">
+                      <div className="d-flex flex-wrap gap-2">
+                        {user.gameTags.slice(0, 4).map((tag) => (
+                          <Badge
+                            key={tag}
+                            style={{
+                              backgroundColor: '#2d2d2d',
+                              color: '#76b900',
+                              border: '1px solid #76b900',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {user.gameTags.length > 0 && (
-                  <div className="mb-3">
-                    <div className="d-flex flex-wrap gap-2">
-                      {user.gameTags.slice(0, 4).map((tag) => (
-                        <Badge
-                          key={tag}
-                          style={{
-                            backgroundColor: '#2d2d2d',
-                            color: '#76b900',
-                            border: '1px solid #76b900',
-                            padding: '0.3rem 0.6rem',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <Badge
+                      style={{
+                        backgroundColor: user.role === 'ADMIN' ? '#ff6b6b' : '#2d2d2d',
+                        color: user.role === 'ADMIN' ? '#fff' : '#76b900',
+                        border: user.role === 'ADMIN' ? 'none' : '1px solid #76b900',
+                        padding: '0.4rem 0.8rem',
+                      }}
+                    >
+                      {user.role}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      style={{
+                        background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                        border: 'none',
+                        color: '#0d0d0d',
+                        fontWeight: '600',
+                      }}
+                      onClick={() => window.location.href = `/profiles/${user.id}`}
+                    >
+                      View Profile
+                    </Button>
                   </div>
-                )}
-
-                <div className="d-flex justify-content-between align-items-center">
-                  <Badge
-                    style={{
-                      backgroundColor: user.role === 'ADMIN' ? '#ff6b6b' : '#2d2d2d',
-                      color: user.role === 'ADMIN' ? '#fff' : '#76b900',
-                      border: user.role === 'ADMIN' ? 'none' : '1px solid #76b900',
-                      padding: '0.4rem 0.8rem',
-                    }}
-                  >
-                    {user.role}
-                  </Badge>
-                  <Button
-                    size="sm"
-                    style={{
-                      background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                      border: 'none',
-                      color: '#0d0d0d',
-                      fontWeight: '600',
-                    }}
-                    onClick={() => window.location.href = `/profiles/${user.id}`}
-                  >
-                    View Profile
-                  </Button>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
       </Row>
     );
   };
