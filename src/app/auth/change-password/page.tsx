@@ -12,7 +12,7 @@ import { changePassword } from '@/lib/dbActions';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 type ChangePasswordForm = {
-  oldpassword: string;
+  oldPassword: string; // Changed from oldpassword to oldPassword
   password: string;
   confirmPassword: string;
 };
@@ -22,7 +22,7 @@ const ChangePassword = () => {
   const email = session?.user?.email || '';
 
   const validationSchema = Yup.object().shape({
-    oldpassword: Yup.string().required('Old password is required'),
+    oldPassword: Yup.string().required('Old password is required'), // Changed field name
     password: Yup.string()
       .required('New password is required')
       .min(6, 'Password must be at least 6 characters'),
@@ -42,15 +42,27 @@ const ChangePassword = () => {
 
   const onSubmit = async (data: ChangePasswordForm) => {
     try {
-      await changePassword({ email, ...data });
+      console.log('Attempting to change password for:', email);
+
+      await changePassword({
+        email,
+        oldPassword: data.oldPassword, // Changed to match function parameter
+        password: data.password,
+      });
 
       await swal('Success!', 'Your password has been changed.', 'success', {
         timer: 2000,
       });
 
       reset();
-    } catch {
-      swal('Error', 'Failed to change password.', 'error');
+    } catch (error) {
+      console.error('Change password error:', error);
+
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Failed to change password. Please try again.';
+
+      swal('Error', errorMessage, 'error');
     }
   };
 
@@ -71,10 +83,10 @@ const ChangePassword = () => {
           maxWidth: '480px',
           width: '100%',
           backgroundColor: '#111',
-          border: '2px solid #76b900', // NEON BORDER
+          border: '2px solid #76b900',
           borderRadius: '18px',
           color: '#ffffff',
-          boxShadow: '0 0 25px rgba(118,185,0,0.35)', // NEON GLOW
+          boxShadow: '0 0 25px rgba(118,185,0,0.35)',
         }}
       >
         <Card.Body>
@@ -99,11 +111,11 @@ const ChangePassword = () => {
               <Form.Label style={{ color: '#ffffff' }}>Old Password</Form.Label>
               <Form.Control
                 type="password"
-                {...register('oldpassword')}
-                className={errors.oldpassword ? 'is-invalid' : ''}
-                style={{ background: '#1a1a1a', color: '#ffffff' }}
+                {...register('oldPassword')}
+                className={errors.oldPassword ? 'is-invalid' : ''}
+                style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #76b900' }}
               />
-              <div className="invalid-feedback">{errors.oldpassword?.message}</div>
+              <div className="invalid-feedback">{errors.oldPassword?.message}</div>
             </Form.Group>
 
             {/* New Password */}
@@ -113,7 +125,7 @@ const ChangePassword = () => {
                 type="password"
                 {...register('password')}
                 className={errors.password ? 'is-invalid' : ''}
-                style={{ background: '#1a1a1a', color: '#ffffff' }}
+                style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #76b900' }}
               />
               <div className="invalid-feedback">{errors.password?.message}</div>
             </Form.Group>
@@ -125,7 +137,7 @@ const ChangePassword = () => {
                 type="password"
                 {...register('confirmPassword')}
                 className={errors.confirmPassword ? 'is-invalid' : ''}
-                style={{ background: '#1a1a1a', color: '#ffffff' }}
+                style={{ background: '#1a1a1a', color: '#ffffff', border: '1px solid #76b900' }}
               />
               <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
             </Form.Group>
@@ -133,7 +145,15 @@ const ChangePassword = () => {
             {/* Buttons */}
             <Row>
               <Col xs={6}>
-                <Button className="w-100 fw-bold btn-primary" style={{ borderRadius: '10px' }}>
+                <Button
+                  type="submit"
+                  className="w-100 fw-bold"
+                  style={{
+                    backgroundColor: '#76b900',
+                    border: 'none',
+                    borderRadius: '10px',
+                  }}
+                >
                   Change
                 </Button>
               </Col>
