@@ -16,7 +16,7 @@
       "profileImage": "/profile.png",
       "followers": 12,
       "following": 5,
-      "gameInterests": ["Valorant", "Apex Legends", "Overwatch 2"],
+      "gameInterestIds": ["Valorant", "Apex Legends", "Overwatch 2"],
       "gameTags": ["FPS", "Competitive", "Team Player"],
       "createdAt": "2024-01-15T10:00:00.000Z",
       "updatedAt": "2024-01-15T10:00:00.000Z"
@@ -31,7 +31,7 @@
       "profileImage": "/profile.png",
       "followers": 8,
       "following": 20,
-      "gameInterests": ["Genshin Impact", "Elden Ring", "Hades"],
+      "gameInterestIds": [1, 2, 3],
       "gameTags": ["RPG", "Adventure", "Solo"],
       "createdAt": "2024-02-02T13:37:00.000Z",
       "updatedAt": "2024-02-02T13:37:00.000Z"

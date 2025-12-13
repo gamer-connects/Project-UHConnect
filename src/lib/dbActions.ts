@@ -103,7 +103,7 @@ export async function createUser(credentials: { email: string; password: string 
       password,
       username, // NEW - required field
       bio: '', // NEW - default empty
-      gameInterests: [], // NEW - empty array
+      gameInterestIds: [], // NEW - empty array
       gameTags: [], // NEW - empty array
       followers: 0, // NEW - starts at 0
       following: 0, // NEW - starts at 0
@@ -141,7 +141,7 @@ export async function searchUsers(searchQuery: string) {
         username: true,
         bio: true,
         profileImage: true,
-        gameInterests: true,
+        gameInterestIds: true,
         gameTags: true,
         followers: true,
         following: true,
@@ -175,7 +175,7 @@ export async function searchUsers(searchQuery: string) {
       username: true,
       bio: true,
       profileImage: true,
-      gameInterests: true,
+      gameInterestIds: true,
       gameTags: true,
       followers: true,
       following: true,

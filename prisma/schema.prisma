@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,31 +8,23 @@ datasource db {
   directUrl = env("UHCDB_POSTGRES_URL_NON_POOLING")
 }
 
-// ===============================
-// USER MODEL
-// ===============================
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  username      String   @unique
-  role          Role     @default(USER)
-  bio           String?
-  profileImage  String?  @default("/profile.png")
-  followers     Int      @default(0)
-  following     Int      @default(0)
-  gameInterests String[]
-  gameTags      String[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // BACK RELATION
-  posts         Post[]
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  password        String
+  role            Role     @default(USER)
+  bio             String?
+  createdAt       DateTime @default(now())
+  followers       Int      @default(0)
+  following       Int      @default(0)
+  gameTags        String[]
+  profileImage    String?  @default("/profile.png")
+  updatedAt       DateTime @updatedAt
+  username        String   @unique
+  gameInterestIds Int[]
+  posts           Post[]
 }
 
-// ===============================
-// STUFF MODEL
-// ===============================
 model Stuff {
   id        Int       @id @default(autoincrement())
   name      String
@@ -43,9 +33,6 @@ model Stuff {
   owner     String
 }
 
-// ===============================
-// EVENT REQUEST MODEL
-// ===============================
 model EventRequest {
   id               Int           @id @default(autoincrement())
   userId           Int
@@ -67,56 +54,38 @@ model EventRequest {
   updatedAt        DateTime      @updatedAt
 }
 
-// ===============================
-// GAME MODEL
-// ===============================
 model Game {
   id          Int      @id @default(autoincrement())
-  title       String
-  type        String
-  image       String
   description String?
   createdAt   DateTime @default(now())
-
-  // BACK RELATION
+  image       String
+  title       String
+  type        String
   posts       Post[]
 }
 
-// ===============================
-// EVENT MODEL
-// ===============================
 model Event {
   id          Int      @id @default(autoincrement())
   title       String
   date        DateTime
-  location    String
   description String
-  flyer       String
-  type        String
   createdAt   DateTime @default(now())
+  flyer       String
+  location    String
+  type        String
 }
 
-// ===============================
-// POST MODEL
-// ===============================
 model Post {
   id        Int      @id @default(autoincrement())
   content   String
   tags      String[]
-
-  // RELATIONS
-  user      User @relation(fields: [userID], references: [id])
   userID    Int
-
-  game      Game @relation(fields: [gameID], references: [id])
   gameID    Int
-
   createdAt DateTime @default(now())
+  game      Game     @relation(fields: [gameID], references: [id])
+  user      User     @relation(fields: [userID], references: [id])
 }
 
-// ===============================
-// ENUMS
-// ===============================
 enum Role {
   USER
   ADMIN
