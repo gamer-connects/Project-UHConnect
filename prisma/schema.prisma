@@ -47,8 +47,8 @@ model EventRequest {
   estimatedPlayers Int?
   location         String?
   additionalNotes  String?
-  eventPoster      String?
-  status           RequestStatus @default(PENDING)
+  eventPoster      String?       // Base64 encoded image or URL
+  status           RequestStatus @default(UNOPENED)  // Changed from PENDING to UNOPENED
   adminNotes       String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -99,8 +99,11 @@ enum Condition {
 }
 
 enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  IN_REVIEW
+  UNOPENED     // New requests admins haven't viewed yet
+  PENDING      // Admin has opened it, reviewing
+  APPROVED     // Approved but not posted yet
+  REJECTED     // Denied
+  LIVE         // Event is approved and posted
+  CLOSED       // Event has passed
+  IN_REVIEW    // Keep this if you want it
 }

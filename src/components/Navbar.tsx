@@ -67,13 +67,23 @@ const NavBar: React.FC = () => {
 
             {/* ADMIN ONLY */}
             {currentUser && role === 'ADMIN' && (
-              <Nav.Link
-                id="admin-stuff-nav"
-                href="/admin"
-                active={pathName === '/admin'}
-              >
-                Admin
-              </Nav.Link>
+              <>
+                <Nav.Link
+                  id="admin-stuff-nav"
+                  href="/admin"
+                  active={pathName === '/admin'}
+                >
+                  Admin
+                </Nav.Link>
+
+                <Nav.Link
+                  id="admin-event-requests-nav"
+                  href="/admin/event-requests"
+                  active={pathName === '/admin/event-requests'}
+                >
+                  Event Requests
+                </Nav.Link>
+              </>
             )}
           </Nav>
 
