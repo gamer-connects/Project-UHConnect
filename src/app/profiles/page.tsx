@@ -6,6 +6,7 @@ import {
   Col, Container, Row, Card, Badge, Button, Spinner,
 } from 'react-bootstrap';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface UserProfile {
   id: number;
@@ -197,19 +198,20 @@ const ProfilePage = () => {
                         <span style={{ color: '#b3b3b3' }}>Following</span>
                       </div>
                     </div>
-                    <Button
-                      style={{
-                        background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                        border: 'none',
-                        padding: '0.5rem 1.5rem',
-                        fontWeight: '700',
-                        color: '#0d0d0d',
-                        boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      Edit Profile
-                    </Button>
+                    <Link href="/profiles/edit">
+                      <Button
+                        style={{
+                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                          border: 'none',
+                          padding: '0.5rem 1.5rem',
+                          fontWeight: '700',
+                          color: '#0d0d0d',
+                          boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
+                        }}
+                      >
+                        Edit Profile
+                      </Button>
+                    </Link>
                   </Col>
                 </Row>
               </Card.Body>

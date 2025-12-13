@@ -1,3 +1,5 @@
+// src/app/api/profile/[id]/route.ts
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -42,6 +44,9 @@ export async function PUT(
     const body = await request.json();
     const { username, bio, gameInterests, gameTags } = body;
 
+    console.log('Updating user:', params.id);
+    console.log('Body:', body);
+
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(params.id, 10) },
       data: {
@@ -52,9 +57,14 @@ export async function PUT(
       },
     });
 
+    console.log('Updated successfully:', updatedUser);
+
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error('Error updating user:', error);
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update user', details: String(error) }, 
+      { status: 500 }
+    );
   }
 }

@@ -1,3 +1,5 @@
+// src/types/next-auth.d.ts
+
 import { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
@@ -7,6 +9,9 @@ declare module 'next-auth' {
     username: string;
     role: string;
     profileImage: string | null;
+    bio?: string | null;
+    gameInterests?: string[];
+    gameTags?: string[];
   }
 
   interface Session {
@@ -16,6 +21,9 @@ declare module 'next-auth' {
       username: string;
       role: string;
       profileImage: string | null;
+      bio?: string | null;
+      gameInterests?: string[];
+      gameTags?: string[];
     } & DefaultSession['user'];
   }
 }
@@ -27,5 +35,8 @@ declare module 'next-auth/jwt' {
     username: string;
     role: string;
     profileImage: string | null;
+    bio?: string | null;
+    gameInterests?: string[];
+    gameTags?: string[];
   }
 }

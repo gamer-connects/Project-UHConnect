@@ -63,6 +63,9 @@ export const authOptions: NextAuthOptions = {
           username: (user as any).username,
           role: (user as any).role,
           profileImage: (user as any).profileImage,
+          bio: (user as any).bio ?? null,
+          gameInterests: (user as any).gameInterests ?? [],
+          gameTags: (user as any).gameTags ?? [],
         };
       }
       return token;
@@ -77,6 +80,9 @@ export const authOptions: NextAuthOptions = {
           username: token.username as string,
           role: token.role as string,
           profileImage: token.profileImage as string | null,
+          bio: token.bio as string | null,
+          gameInterests: token.gameInterests as string[],
+          gameTags: token.gameTags as string[],
         },
       };
     },
