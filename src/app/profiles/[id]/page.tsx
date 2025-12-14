@@ -12,7 +12,6 @@ import {
   Button,
   Spinner,
 } from 'react-bootstrap';
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface Game {
@@ -41,7 +40,6 @@ const PublicProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Safely extract userId as string, handle array case
   const userId = Array.isArray(id) ? id[0] : id;
 
   useEffect(() => {
@@ -154,7 +152,8 @@ const PublicProfilePage = () => {
               <Card.Body className="p-4">
                 <Row className="align-items-center">
                   <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    <Image
+                    {/* FIXED: Changed from Image to img */}
+                    <img
                       src={profile.profileImage || '/profile.png'}
                       alt={profile.username}
                       width={150}

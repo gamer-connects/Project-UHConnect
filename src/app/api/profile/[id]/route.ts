@@ -54,79 +54,60 @@ export async function PUT(
 ) {
   try {
     const session = await getServerSession(authOptions);
-
-    // 1. Must be logged in
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const currentUserId = parseInt(session.user.id, 10);
     const targetUserId = parseInt(params.id, 10);
-
     if (isNaN(targetUserId)) {
       return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
     }
 
-    // 2. Can only edit own profile
     if (currentUserId !== targetUserId) {
       return NextResponse.json({ error: 'Forbidden: You can only edit your own profile' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { username, bio, gameInterestIds, gameTags } = body;
+    // ADD profileImage here
+    const { username, bio, gameInterestIds, gameTags, profileImage } = body;
 
-    // Prepare update data
     const updateData: any = {};
 
-    // Validate and add username if provided
+    // Username validation (unchanged)
     if (username !== undefined) {
       if (typeof username !== 'string') {
         return NextResponse.json({ error: 'Username must be a string' }, { status: 400 });
       }
-
       const trimmedUsername = username.trim();
       if (trimmedUsername === '') {
         return NextResponse.json({ error: 'Username cannot be empty' }, { status: 400 });
       }
-
-      if (trimmedUsername.length < MIN_USERNAME_LENGTH) {
-        return NextResponse.json({ error: `Username must be at least ${MIN_USERNAME_LENGTH} characters` }, { status: 400 });
+      if (trimmedUsername.length < MIN_USERNAME_LENGTH || trimmedUsername.length > MAX_USERNAME_LENGTH) {
+        return NextResponse.json({ error: `Username must be between ${MIN_USERNAME_LENGTH} and ${MAX_USERNAME_LENGTH} characters` }, { status: 400 });
       }
-
-      if (trimmedUsername.length > MAX_USERNAME_LENGTH) {
-        return NextResponse.json({ error: `Username must be at most ${MAX_USERNAME_LENGTH} characters` }, { status: 400 });
-      }
-
       if (!USERNAME_REGEX.test(trimmedUsername)) {
         return NextResponse.json({ error: 'Username can only contain letters, numbers, and underscores' }, { status: 400 });
       }
-
-      // Check uniqueness (exclude current user)
-      const existingUser = await prisma.user.findUnique({
-        where: { username: trimmedUsername },
-      });
-
+      const existingUser = await prisma.user.findUnique({ where: { username: trimmedUsername } });
       if (existingUser && existingUser.id !== targetUserId) {
         return NextResponse.json({ error: 'Username is already taken' }, { status: 400 });
       }
-
       updateData.username = trimmedUsername;
     }
 
-    // Validate bio
+    // Bio
     if (bio !== undefined) {
       if (typeof bio !== 'string') {
         return NextResponse.json({ error: 'Bio must be a string' }, { status: 400 });
       }
-
       if (bio.length > MAX_BIO_LENGTH) {
         return NextResponse.json({ error: `Bio must be at most ${MAX_BIO_LENGTH} characters` }, { status: 400 });
       }
-
       updateData.bio = bio.trim();
     }
 
-    // Optionally validate gameInterestIds and gameTags (arrays)
+    // Game interests
     if (gameInterestIds !== undefined) {
       if (!Array.isArray(gameInterestIds)) {
         return NextResponse.json({ error: 'gameInterestIds must be an array of numbers' }, { status: 400 });
@@ -134,6 +115,7 @@ export async function PUT(
       updateData.gameInterestIds = gameInterestIds;
     }
 
+    // Game tags
     if (gameTags !== undefined) {
       if (!Array.isArray(gameTags)) {
         return NextResponse.json({ error: 'gameTags must be an array of strings' }, { status: 400 });
@@ -141,34 +123,49 @@ export async function PUT(
       updateData.gameTags = gameTags;
     }
 
-    // If nothing to update
+    // NEW: Profile Image validation
+    if (profileImage !== undefined) {
+      if (typeof profileImage !== 'string' && profileImage !== null) {
+        return NextResponse.json({ error: 'profileImage must be a string or null' }, { status: 400 });
+      }
+
+      // Allow Vercel Blob URLs, or empty/null
+      if (
+        profileImage &&
+        !profileImage.startsWith('https://') // All external URLs start with https
+      ) {
+        return NextResponse.json({ error: 'Invalid profile image URL format' }, { status: 400 });
+      }
+
+      updateData.profileImage = profileImage || null;
+    }
+
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
-    // Perform update
     const updatedUser = await prisma.user.update({
       where: { id: targetUserId },
       data: updateData,
       select: {
         id: true,
         username: true,
+        email: true,
         bio: true,
+        profileImage: true,
+        followers: true,
+        following: true,
         gameInterestIds: true,
         gameTags: true,
-        // include other fields you want to return
       },
     });
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {
     console.error('Error updating user:', error);
-
-    // Prisma unique constraint violation
     if (error.code === 'P2002' && error.meta?.target?.includes('username')) {
       return NextResponse.json({ error: 'Username is already taken' }, { status: 400 });
     }
-
     return NextResponse.json(
       { error: 'Failed to update profile', details: process.env.NODE_ENV === 'development' ? String(error) : undefined },
       { status: 500 }
