@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import path from 'path';
-import { randomUUID } from 'crypto';
+import { put } from '@vercel/blob';
+import { NextResponse } from 'next/server';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'profiles');
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -14,27 +10,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validate file type
-    const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!acceptedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Only JPG, PNG, and WebP allowed.' }, { status: 400 });
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
     }
 
-    // Validate file size (5MB max)
+    // Validate size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Generate unique filename
-    const ext = path.extname(file.name) || '.jpg';
-    const filename = `${randomUUID()}${ext}`;
-    const filepath = path.join(UPLOAD_DIR, filename);
-
-    await writeFile(filepath, buffer);
-
-    const url = `/uploads/profiles/${filename}`;
+    // Upload directly to Vercel Blob
+    const { url } = await put(`profiles/${file.name}`, file, {
+      access: 'public',
+      addRandomSuffix: true, // Makes filename unique
+    });
 
     return NextResponse.json({ url });
   } catch (error) {
