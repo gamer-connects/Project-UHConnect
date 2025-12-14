@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { createPost } from '@/lib/dbActions';
 import { useSession } from 'next-auth/react';
+import { Form } from 'react-bootstrap';
 
 type PostFormProps = {
   gameOptions: { id: number; title: string }[];
@@ -61,9 +62,7 @@ export default function PostForm({ gameOptions }: PostFormProps) {
 
       {/* Content */}
       <div>
-        <label className="form-label text-light fw-semibold">
-          Post Content
-        </label>
+        <Form.Label>Post Content</Form.Label>
         <textarea
           placeholder="What's on your mind?"
           value={content}
@@ -81,9 +80,7 @@ export default function PostForm({ gameOptions }: PostFormProps) {
 
       {/* Tags */}
       <div>
-        <label className="form-label text-light fw-semibold">
-          Tags
-        </label>
+        <Form.Label>Tags</Form.Label>
         <input
           type="text"
           placeholder="e.g. multiplayer, tips, review"
@@ -96,16 +93,14 @@ export default function PostForm({ gameOptions }: PostFormProps) {
             border: '1px solid #333',
           }}
         />
-        <small className="text-muted">
+        <small className="text-light">
           Separate tags with commas
         </small>
       </div>
 
       {/* Game Select */}
       <div>
-        <label className="form-label text-light fw-semibold">
-          Select Game
-        </label>
+        <Form.Label>Select Game</Form.Label>
         <select
           value={gameID}
           onChange={(e) => setGameID(Number(e.target.value))}
