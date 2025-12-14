@@ -4,104 +4,112 @@ import config from '../config/settings.development.json';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.post.deleteMany({});
-  await prisma.stuff.deleteMany({});
-  await prisma.game.deleteMany({});
-  await prisma.user.deleteMany({});
+  console.log('🌱 Seeding database...');
 
-  console.log('Seeding database...');
+  /*
+   Clear tables (FK order)
+  */
+  await prisma.post.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.eventRequest.deleteMany();
+  await prisma.stuff.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.game.deleteMany();
 
-  if (config.defaultUsers) {
-    await Promise.all(
-      config.defaultUsers.map(async (user) => {
-        console.log(`➡️  Creating user: ${user.email}`);
-        return prisma.user.upsert({
-          where: { id: user.id },
-          update: {},
-          create: {
-            id: user.id,
-            email: user.email,
-            password: user.password,
-            role: (user.role as Role) || Role.USER,
-            username: user.username,
-            bio: user.bio,
-            profileImage: user.profileImage,
-            followers: user.followers,
-            following: user.following,
-            gameInterestIds: (user.gameInterestIds as number[]) || [],
-            gameTags: user.gameTags || [],
-            createdAt: new Date(user.createdAt),
-            updatedAt: new Date(user.updatedAt),
-          },
-        });
-      }),
-    );
+  /*
+   GAMES
+  */
+  if (config.defaultGames?.length) {
+    console.log('🎮 Seeding games...');
+    await prisma.game.createMany({
+      data: config.defaultGames.map((game) => ({
+        id: game.id,
+        title: game.title, // <-- JSON uses "name"
+        description: game.description,
+        image: game.image,
+        type: 'GAME',
+      })),
+      skipDuplicates: true,
+    });
   }
 
-  if (config.defaultData) {
-    await Promise.all(
-      config.defaultData.map((item, index) => {
-        console.log(`Adding stuff: ${item.name}`);
-        return prisma.stuff.upsert({
-          where: { id: index + 1 },
-          update: {},
-          create: {
-            name: item.name,
-            quantity: item.quantity,
-            owner: item.owner,
-            condition: (item.condition as Condition) || Condition.good,
-          },
-        });
-      }),
-    );
+  /*
+   USERS
+  */
+  if (config.defaultUsers?.length) {
+    console.log('👤 Seeding users...');
+    await prisma.user.createMany({
+      data: config.defaultUsers.map((user) => ({
+        id: user.id,
+        email: user.email,
+        password: user.password,
+        role: user.role as Role,
+        username: user.username,
+        bio: user.bio,
+        profileImage: user.profileImage ?? '/profile.png',
+        followers: user.followers ?? 0,
+        following: user.following ?? 0,
+        gameTags: user.gameTags ?? [],
+        gameInterestIds: [], // MUST be number[]
+        createdAt: new Date(user.createdAt),
+        updatedAt: new Date(user.updatedAt),
+      })),
+      skipDuplicates: true,
+    });
   }
 
-  if (config.defaultGames) {
-    await Promise.all(
-      config.defaultGames.map((game) => {
-        console.log(`Creating game: ${game.title}`);
-        return prisma.game.upsert({
-          where: { id: game.id },
-          update: {},
-          create: {
-            id: game.id,
-            title: game.title,
-            type: game.type,
-            image: game.image,
-            description: game.description,
-          },
-        });
-      }),
-    );
+  /*
+   STUFF
+  */
+  if (config.defaultData?.length) {
+    console.log('📦 Seeding stuff...');
+    await prisma.stuff.createMany({
+      data: config.defaultData.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        owner: item.owner,
+        condition: item.condition as Condition,
+      })),
+    });
   }
 
-  if (config.defaultPosts) {
-    await Promise.all(
-      config.defaultPosts.map((post) => {
-        console.log(`Creating post: ${post.id}`);
-        return prisma.post.upsert({
-          where: { id: post.id },
-          update: {},
-          create: {
-            id: post.id,
-            content: post.content,
-            tags: post.tags || [],
-            userID: post.userID,
-            gameID: post.gameID,
-            createdAt: new Date(post.createdAt),
-          },
-        });
-      }),
+  /*
+   POSTS (FK safe)
+  */
+  if (config.defaultPosts?.length) {
+    console.log('📝 Seeding posts...');
+
+    const users = await prisma.user.findMany({ select: { id: true } });
+    const games = await prisma.game.findMany({ select: { id: true } });
+
+    const userIds = new Set(users.map((u) => u.id));
+    const gameIds = new Set(games.map((g) => g.id));
+
+    const validPosts = config.defaultPosts.filter(
+      (post) => userIds.has(post.userID) && gameIds.has(post.gameID),
     );
+
+    await prisma.post.createMany({
+      data: validPosts.map((post) => ({
+        id: post.id,
+        content: post.content,
+        tags: post.tags ?? [],
+        userID: post.userID,
+        gameID: post.gameID,
+        createdAt: new Date(post.createdAt),
+      })),
+      skipDuplicates: true,
+    });
   }
 
-  console.log('Database seeded successfully!');
+  console.log('✅ Database seeded successfully!');
 }
 
 main()
-  .then(() => prisma.$disconnect())
-  .catch(async (e) => {
+  .catch((e) => {
     console.error('❌ Seed failed:', e);
-    await prisma.$disconnect();
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

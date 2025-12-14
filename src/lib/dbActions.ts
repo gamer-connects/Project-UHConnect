@@ -199,3 +199,21 @@ export default async function getAllPosts() {
     },
   });
 }
+
+type CreatePostProps = {
+  content: string;
+  tags: string[];
+  gameID: number;
+  userID: number; // pass current user ID
+};
+
+export async function createPost({ content, tags, gameID, userID }: CreatePostProps) {
+  await prisma.post.create({
+    data: {
+      content,
+      tags,
+      gameID,
+      userID,
+    },
+  });
+}
