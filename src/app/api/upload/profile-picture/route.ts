@@ -15,24 +15,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
+    const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!acceptedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Only JPG, PNG, and WebP allowed.' }, { status: 400 });
     }
 
-    // Validate size (5MB)
+    // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const buffer = Buffer.from(await file.arrayBuffer());
 
     // Generate unique filename
     const ext = path.extname(file.name) || '.jpg';
     const filename = `${randomUUID()}${ext}`;
     const filepath = path.join(UPLOAD_DIR, filename);
 
-    // Ensure directory exists
     await writeFile(filepath, buffer);
 
     const url = `/uploads/profiles/${filename}`;
@@ -43,10 +42,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }
-
-// Important: Configure body parser
-export const config = {
-  api: {
-    bodyParser: false, // Required for file uploads
-  },
-};
