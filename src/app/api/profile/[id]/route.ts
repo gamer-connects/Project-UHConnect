@@ -1,5 +1,5 @@
 // src/app/api/profile/[id]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from "@/lib/authOptions";
@@ -13,7 +13,7 @@ const MAX_USERNAME_LENGTH = 20;
 const MAX_BIO_LENGTH = 500; // Adjust as needed
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
@@ -49,7 +49,7 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
