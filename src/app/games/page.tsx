@@ -69,8 +69,9 @@ export default function GamesPage() {
               <GameCard
                 title={game.title}
                 image={game.image}
-                href={`/games/${game.title.toLowerCase()}`}
+                href={`/games/${game.id}`}
               />
+
             </Col>
           ))}
         </Row>

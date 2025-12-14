@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("UHCDB_POSTGRES_PRISMA_URL")
-  directUrl = env("UHCDB_POSTGRES_URL_NON_POOLING")
+  url       = env("POSTGRES_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
@@ -48,7 +48,7 @@ model EventRequest {
   location         String?
   additionalNotes  String?
   eventPoster      String?
-  status           RequestStatus @default(UNOPENED)
+  status           RequestStatus @default(PENDING)
   adminNotes       String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -103,7 +103,4 @@ enum RequestStatus {
   APPROVED
   REJECTED
   IN_REVIEW
-  UNOPENED
-  LIVE
-  CLOSED
 }
