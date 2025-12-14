@@ -5,13 +5,12 @@ import { useEffect, useState } from 'react';
 import {
   Col, Container, Row, Card, Badge, Button, Spinner,
 } from 'react-bootstrap';
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface Game {
   id: number;
   title: string;
-  name?: string; // fallback if API uses 'name'
+  name?: string;
 }
 
 interface UserProfile {
@@ -22,7 +21,7 @@ interface UserProfile {
   profileImage: string | null;
   followers: number;
   following: number;
-  gameInterestIds: number[]; // Changed from string[] to number[]
+  gameInterestIds: number[];
   gameTags: string[];
 }
 
@@ -43,7 +42,6 @@ const ProfilePage = () => {
       }
 
       try {
-        // Fixed: use session.user.id instead of undefined userId
         const profileRes = await fetch(`/api/profile/${session.user.id}`, {
           cache: 'no-store',
         });
@@ -51,7 +49,7 @@ const ProfilePage = () => {
         const profileData: UserProfile = await profileRes.json();
 
         const gamesRes = await fetch('/api/games', {
-          cache: 'no-store', // optional but good for consistency
+          cache: 'no-store',
         });
         if (!gamesRes.ok) throw new Error('Failed to fetch games');
         const gamesData: Game[] = await gamesRes.json();
@@ -69,13 +67,11 @@ const ProfilePage = () => {
     fetchData();
   }, [session, status]);
 
-  // Helper: Convert game ID to title
   const getGameTitle = (gameId: number) => {
     const game = games.find(g => g.id === gameId);
     return game?.title || game?.name || `Game #${gameId}`;
   };
 
-  // Loading State
   if (loading || status === 'loading') {
     return (
       <main
@@ -92,7 +88,6 @@ const ProfilePage = () => {
     );
   }
 
-  // Error / Not Logged In
   if (error || !profile) {
     return (
       <main
@@ -181,7 +176,8 @@ const ProfilePage = () => {
               <Card.Body className="p-4">
                 <Row className="align-items-center">
                   <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    <Image
+                    {/* FIXED: Use regular img instead of Next Image for external URLs */}
+                    <img
                       src={profile.profileImage || '/profile.png'}
                       alt="Profile"
                       width={150}
@@ -263,7 +259,7 @@ const ProfilePage = () => {
           </Col>
         </Row>
 
-        {/* Game Interests - Now shows titles! */}
+        {/* Game Interests */}
         <Row className="justify-content-center mb-4">
           <Col md={10} lg={8}>
             <Card
