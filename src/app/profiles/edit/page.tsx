@@ -186,6 +186,7 @@ const EditProfilePage = () => {
         throw new Error(errorMessage);
       }
 
+      router.refresh();
       router.push('/profiles');
     } catch (err) {
       console.error('Error updating profile:', err);

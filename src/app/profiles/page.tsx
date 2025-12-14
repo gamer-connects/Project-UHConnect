@@ -43,13 +43,16 @@ const ProfilePage = () => {
       }
 
       try {
-        // Fetch profile
-        const profileRes = await fetch(`/api/profile/${session.user.id}`);
+        // Fixed: use session.user.id instead of undefined userId
+        const profileRes = await fetch(`/api/profile/${session.user.id}`, {
+          cache: 'no-store',
+        });
         if (!profileRes.ok) throw new Error('Failed to fetch profile');
         const profileData: UserProfile = await profileRes.json();
 
-        // Fetch games list
-        const gamesRes = await fetch('/api/games');
+        const gamesRes = await fetch('/api/games', {
+          cache: 'no-store', // optional but good for consistency
+        });
         if (!gamesRes.ok) throw new Error('Failed to fetch games');
         const gamesData: Game[] = await gamesRes.json();
 
