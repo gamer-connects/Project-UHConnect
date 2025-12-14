@@ -15,6 +15,7 @@ import {
 } from 'react-bootstrap';
 import { searchUsers } from '@/lib/dbActions';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react'; // ADD THIS IMPORT
 
 type User = {
   id: number;
@@ -37,6 +38,7 @@ type Game = {
 };
 
 export default function UserSearch() {
+  const { data: session } = useSession(); // ADD THIS LINE
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
   const [selectedGameTitle, setSelectedGameTitle] = useState<string | null>(null);
@@ -44,7 +46,6 @@ export default function UserSearch() {
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch all games on mount
   useEffect(() => {
     const fetchGames = async () => {
       try {
@@ -63,7 +64,6 @@ export default function UserSearch() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      // This will work once you update searchUsers in dbActions.ts
       const results = await searchUsers(searchQuery, selectedGameId);
       setUsers(results);
     } catch (error) {
@@ -73,19 +73,16 @@ export default function UserSearch() {
     }
   };
 
-  // Initial load + when search query changes manually
   useEffect(() => {
     handleSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
-  // Auto-search when game filter changes
   useEffect(() => {
     handleSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGameId]);
 
-  // Fixed: Re-add handleKeyPress
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -119,7 +116,12 @@ export default function UserSearch() {
     return 'All Users';
   };
 
-  // ... renderContent remains exactly the same as yours ...
+  // ADD THIS HELPER FUNCTION
+  const getProfileLink = (userId: number) => {
+    const currentUserId = session?.user?.id ? parseInt(session.user.id, 10) : null;
+    // If viewing own profile, redirect to /profiles instead of /profiles/[id]
+    return currentUserId === userId ? '/profiles' : `/profiles/${userId}`;
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -142,12 +144,15 @@ export default function UserSearch() {
       <Row className="g-4">
         {users.map((user) => {
           const userGameTitles = getGameTitles(user.gameInterestIds);
+          const currentUserId = session?.user?.id ? parseInt(session.user.id, 10) : null;
+          const isOwnProfile = currentUserId === user.id;
+
           return (
             <Col key={user.id} md={6} lg={12} xl={6}>
               <Card
                 style={{
                   backgroundColor: '#1a1a1a',
-                  border: '2px solid #76b900',
+                  border: isOwnProfile ? '2px solid #39ff14' : '2px solid #76b900', // Highlight own profile
                   boxShadow: '0 4px 16px rgba(118, 185, 0, 0.2)',
                   transition: 'all 0.3s ease',
                 }}
@@ -184,6 +189,18 @@ export default function UserSearch() {
                         }}
                       >
                         {user.username}
+                        {isOwnProfile && (
+                          <Badge
+                            style={{
+                              marginLeft: '0.5rem',
+                              background: 'linear-gradient(135deg, #39ff14 0%, #76b900 100%)',
+                              color: '#0d0d0d',
+                              fontSize: '0.7rem',
+                            }}
+                          >
+                            YOU
+                          </Badge>
+                        )}
                       </Card.Title>
                       <Card.Text style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
                         {user.email}
@@ -284,17 +301,20 @@ export default function UserSearch() {
                       {user.role}
                     </Badge>
 
-                    <Link href={`/profiles/${user.id}`}>
+                    {/* UPDATED: Use dynamic link based on whether it's own profile */}
+                    <Link href={getProfileLink(user.id)}>
                       <Button
                         size="sm"
                         style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                          background: isOwnProfile
+                            ? 'linear-gradient(135deg, #39ff14 0%, #76b900 100%)'
+                            : 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
                           border: 'none',
                           color: '#0d0d0d',
                           fontWeight: '600',
                         }}
                       >
-                        View Profile
+                        {isOwnProfile ? 'View My Profile' : 'View Profile'}
                       </Button>
                     </Link>
                   </div>
@@ -324,7 +344,7 @@ export default function UserSearch() {
                   placeholder="Username or email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress} // Now works!
+                  onKeyPress={handleKeyPress}
                   className="border-0 py-3 shadow-none"
                 />
                 <Button variant="success" onClick={handleSearch} disabled={loading}>
