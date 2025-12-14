@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import {
-  Col, Container, Row, Card, Badge, Button, Spinner,
+  Col, Container, Row, Card, Badge, Button, Spinner, Modal, ListGroup,
 } from 'react-bootstrap';
 import Link from 'next/link';
 
@@ -25,12 +25,29 @@ interface UserProfile {
   gameTags: string[];
 }
 
+interface FollowUser {
+  id: number;
+  username: string;
+  email: string;
+  profileImage: string | null;
+  bio: string | null;
+  followers: number;
+  following: number;
+}
+
 const ProfilePage = () => {
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [followersList, setFollowersList] = useState<FollowUser[]>([]);
+  const [followingList, setFollowingList] = useState<FollowUser[]>([]);
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +87,48 @@ const ProfilePage = () => {
   const getGameTitle = (gameId: number) => {
     const game = games.find(g => g.id === gameId);
     return game?.title || game?.name || `Game #${gameId}`;
+  };
+
+  const fetchFollowers = async () => {
+    if (!profile) return;
+    setModalLoading(true);
+    try {
+      const res = await fetch(`/api/users/${profile.id}/followers`);
+      if (res.ok) {
+        const data = await res.json();
+        setFollowersList(data);
+      }
+    } catch (err) {
+      console.error('Error fetching followers:', error);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const fetchFollowing = async () => {
+    if (!profile) return;
+    setModalLoading(true);
+    try {
+      const res = await fetch(`/api/users/${profile.id}/following`);
+      if (res.ok) {
+        const data = await res.json();
+        setFollowingList(data);
+      }
+    } catch (err) {
+      console.error('Error fetching following:', error);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleShowFollowers = () => {
+    setShowFollowersModal(true);
+    fetchFollowers();
+  };
+
+  const handleShowFollowing = () => {
+    setShowFollowingModal(true);
+    fetchFollowing();
   };
 
   if (loading || status === 'loading') {
@@ -176,7 +235,6 @@ const ProfilePage = () => {
               <Card.Body className="p-4">
                 <Row className="align-items-center">
                   <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    {/* FIXED: Use regular img instead of Next Image for external URLs */}
                     <img
                       src={profile.profileImage || '/profile.png'}
                       alt="Profile"
@@ -204,16 +262,31 @@ const ProfilePage = () => {
                       {profile.email}
                     </p>
                     <div className="d-flex gap-4 mb-3">
-                      <div style={{ fontSize: '1.1rem' }}>
+                      <button
+                        type="button"
+                        onClick={handleShowFollowers}
+                        className="bg-transparent border-0 p-0"
+                        style={{ fontSize: '1.1rem', cursor: 'pointer' }}
+                      >
                         <strong style={{ color: '#76b900' }}>{profile.followers}</strong>
                         {' '}
-                        <span style={{ color: '#b3b3b3' }}>Followers</span>
-                      </div>
-                      <div style={{ fontSize: '1.1rem' }}>
+                        <span style={{ color: '#b3b3b3', textDecoration: 'underline' }}>
+                          Followers
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleShowFollowing}
+                        className="bg-transparent border-0 p-0"
+                        style={{ fontSize: '1.1rem', cursor: 'pointer' }}
+                      >
                         <strong style={{ color: '#76b900' }}>{profile.following}</strong>
                         {' '}
-                        <span style={{ color: '#b3b3b3' }}>Following</span>
-                      </div>
+                        <span style={{ color: '#b3b3b3', textDecoration: 'underline' }}>
+                          Following
+                        </span>
+                      </button>
                     </div>
                     <Link href="/profiles/edit">
                       <Button
@@ -345,6 +418,180 @@ const ProfilePage = () => {
           </Col>
         </Row>
       </Container>
+
+      {/* Followers Modal */}
+      <Modal
+        show={showFollowersModal}
+        onHide={() => setShowFollowersModal(false)}
+        centered
+        contentClassName="bg-dark"
+      >
+        <Modal.Header
+          closeButton
+          style={{ backgroundColor: '#1a1a1a', borderBottom: '2px solid #76b900' }}
+        >
+          <Modal.Title style={{ color: '#76b900' }}>
+            Followers (
+            {profile.followers}
+            )
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ backgroundColor: '#1a1a1a', maxHeight: '400px', overflowY: 'auto' }}
+        >
+          {(() => {
+            if (modalLoading) {
+              return (
+                <div className="text-center py-4">
+                  <Spinner animation="border" style={{ color: '#76b900' }} />
+                </div>
+              );
+            }
+
+            if (followersList.length === 0) {
+              return (
+                <p style={{ color: '#b3b3b3', textAlign: 'center' }}>
+                  No followers yet
+                </p>
+              );
+            }
+
+            return (
+              <ListGroup variant="flush">
+                {followersList.map((user) => (
+                  <ListGroup.Item
+                    key={user.id}
+                    style={{
+                      backgroundColor: '#0d0d0d',
+                      border: '1px solid #2d2d2d',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <Link
+                      href={`/profiles/${user.id}`}
+                      style={{ textDecoration: 'none' }}
+                      onClick={() => setShowFollowersModal(false)}
+                    >
+                      <div className="d-flex align-items-center">
+                        <img
+                          src={user.profileImage || '/profile.png'}
+                          alt={user.username}
+                          width={50}
+                          height={50}
+                          className="rounded-circle"
+                          style={{
+                            objectFit: 'cover',
+                            border: '2px solid #76b900',
+                            marginRight: '1rem',
+                          }}
+                        />
+                        <div>
+                          <div style={{ color: '#76b900', fontWeight: 'bold' }}>
+                            {user.username}
+                          </div>
+                          <div style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
+                            {user.followers}
+                            {' '}
+                            followers
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            );
+          })()}
+        </Modal.Body>
+
+      </Modal>
+
+      {/* Following Modal */}
+      <Modal
+        show={showFollowingModal}
+        onHide={() => setShowFollowingModal(false)}
+        centered
+        contentClassName="bg-dark"
+      >
+        <Modal.Header
+          closeButton
+          style={{ backgroundColor: '#1a1a1a', borderBottom: '2px solid #76b900' }}
+        >
+          <Modal.Title style={{ color: '#76b900' }}>
+            Following (
+            {profile.following}
+            )
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ backgroundColor: '#1a1a1a', maxHeight: '400px', overflowY: 'auto' }}
+        >
+          {(() => {
+            if (modalLoading) {
+              return (
+                <div className="text-center py-4">
+                  <Spinner animation="border" style={{ color: '#76b900' }} />
+                </div>
+              );
+            }
+
+            if (followingList.length === 0) {
+              return (
+                <p style={{ color: '#b3b3b3', textAlign: 'center' }}>
+                  Not following anyone yet
+                </p>
+              );
+            }
+
+            return (
+              <ListGroup variant="flush">
+                {followingList.map((user) => (
+                  <ListGroup.Item
+                    key={user.id}
+                    style={{
+                      backgroundColor: '#0d0d0d',
+                      border: '1px solid #2d2d2d',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <Link
+                      href={`/profiles/${user.id}`}
+                      style={{ textDecoration: 'none' }}
+                      onClick={() => setShowFollowingModal(false)}
+                    >
+                      <div className="d-flex align-items-center">
+                        <img
+                          src={user.profileImage || '/profile.png'}
+                          alt={user.username}
+                          width={50}
+                          height={50}
+                          className="rounded-circle"
+                          style={{
+                            objectFit: 'cover',
+                            border: '2px solid #76b900',
+                            marginRight: '1rem',
+                          }}
+                        />
+                        <div>
+                          <div style={{ color: '#76b900', fontWeight: 'bold' }}>
+                            {user.username}
+                          </div>
+                          <div style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
+                            {user.followers}
+                            {' '}
+                            followers
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            );
+          })()}
+        </Modal.Body>
+
+      </Modal>
     </main>
   );
 };

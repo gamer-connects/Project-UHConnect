@@ -28,7 +28,7 @@ async function main() {
             profileImage: user.profileImage,
             followers: user.followers,
             following: user.following,
-            gameInterestIds: (user.gameInterestIds as number[]) || [],
+            gameInterestIds: [1, 2, 3],
             gameTags: user.gameTags || [],
             createdAt: new Date(user.createdAt),
             updatedAt: new Date(user.updatedAt),
