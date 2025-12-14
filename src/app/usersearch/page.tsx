@@ -1,354 +1,385 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import './usersearch.css';
 import {
-  Col, Container, Row, Card, Badge, Button, Spinner,
+  Col,
+  Container,
+  Row,
+  Form,
+  InputGroup,
+  Button,
+  Card,
+  Badge,
+  Spinner,
 } from 'react-bootstrap';
+import { searchUsers } from '@/lib/dbActions';
 import Link from 'next/link';
 
-// USER SEARCH PAGE FIX BELOW - Replace Image with img
-
-interface Game {
+type User = {
   id: number;
-  title: string;
-  name?: string;
-}
-
-interface UserProfile {
-  id: number;
-  username: string;
   email: string;
+  username: string;
   bio: string | null;
   profileImage: string | null;
-  followers: number;
-  following: number;
   gameInterestIds: number[];
   gameTags: string[];
-}
+  followers: number;
+  following: number;
+  role: string;
+};
 
-const ProfilePage = () => {
-  const { data: session, status } = useSession();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+type Game = {
+  id: number;
+  title: string;
+  type: string;
+  image: string;
+};
 
+export default function UserSearch() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
+  const [selectedGameTitle, setSelectedGameTitle] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [allGames, setAllGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch all games on mount
   useEffect(() => {
-    const fetchData = async () => {
-      if (status === 'loading') return;
-      if (!session?.user?.id) {
-        setError('Please log in to view your profile');
-        setLoading(false);
-        return;
-      }
-
+    const fetchGames = async () => {
       try {
-        const profileRes = await fetch(`/api/profile/${session.user.id}`, {
-          cache: 'no-store',
-        });
-        if (!profileRes.ok) throw new Error('Failed to fetch profile');
-        const profileData: UserProfile = await profileRes.json();
-
-        const gamesRes = await fetch('/api/games', {
-          cache: 'no-store',
-        });
-        if (!gamesRes.ok) throw new Error('Failed to fetch games');
-        const gamesData: Game[] = await gamesRes.json();
-
-        setProfile(profileData);
-        setGames(gamesData);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load profile or games');
-      } finally {
-        setLoading(false);
+        const response = await fetch('/api/games');
+        if (response.ok) {
+          const gamesData: Game[] = await response.json();
+          setAllGames(gamesData);
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
       }
     };
+    fetchGames();
+  }, []);
 
-    fetchData();
-  }, [session, status]);
-
-  const getGameTitle = (gameId: number) => {
-    const game = games.find(g => g.id === gameId);
-    return game?.title || game?.name || `Game #${gameId}`;
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      // This will work once you update searchUsers in dbActions.ts
+      const results = await searchUsers(searchQuery, selectedGameId);
+      setUsers(results);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading || status === 'loading') {
-    return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Spinner animation="border" style={{ color: '#76b900' }} />
-      </main>
-    );
-  }
+  // Initial load + when search query changes manually
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
-  if (error || !profile) {
-    return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative',
-        }}
-      >
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `
-            radial-gradient(circle at 20% 30%, rgba(118, 185, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
-          `,
-          pointerEvents: 'none',
-        }}
-        />
-        <div className="text-center" style={{ zIndex: 1 }}>
-          <p style={{ color: '#b3b3b3', fontSize: '1.2rem' }}>
-            {error || 'Profile not found'}
-          </p>
-          {!session && (
-            <Button
-              href="/auth/signin"
-              style={{
-                background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                border: 'none',
-                padding: '0.7rem 2rem',
-                fontWeight: '700',
-                color: '#0d0d0d',
-                boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
-                marginTop: '1.5rem',
-              }}
-            >
-              Sign In
-            </Button>
-          )}
+  // Auto-search when game filter changes
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGameId]);
+
+  // Fixed: Re-add handleKeyPress
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleGameClick = (game: Game) => {
+    if (selectedGameId === game.id) {
+      setSelectedGameId(null);
+      setSelectedGameTitle(null);
+    } else {
+      setSelectedGameId(game.id);
+      setSelectedGameTitle(game.title);
+    }
+  };
+
+  const getGameTitles = (gameIds: number[]): string[] => gameIds
+    .map((id) => allGames.find((game) => game.id === id)?.title)
+    .filter(Boolean) as string[];
+
+  const getResultsTitle = () => {
+    if (selectedGameTitle && searchQuery) {
+      return `"${searchQuery}" in ${selectedGameTitle}`;
+    }
+    if (selectedGameTitle) {
+      return `Players in ${selectedGameTitle}`;
+    }
+    if (searchQuery) {
+      return `Results for "${searchQuery}"`;
+    }
+    return 'All Users';
+  };
+
+  // ... renderContent remains exactly the same as yours ...
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="text-center mt-5">
+          <Spinner animation="border" style={{ color: '#76b900' }} />
+          <p className="mt-3" style={{ color: '#b3b3b3' }}>Loading users...</p>
         </div>
-      </main>
-    );
-  }
+      );
+    }
+    if (users.length === 0) {
+      return (
+        <div className="text-center mt-5">
+          <p className="lead" style={{ color: '#b3b3b3' }}>No users found</p>
+        </div>
+      );
+    }
 
-  return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%)',
-        padding: '2rem 0',
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `
-            radial-gradient(circle at 20% 30%, rgba(118, 185, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.05) 0%, transparent 50%)
-          `,
-          pointerEvents: 'none',
-        }}
-      />
-      <Container id="profile-page" className="py-4" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Profile Header */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.3)',
-                border: '2px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <Row className="align-items-center">
-                  <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    {/* FIXED: Use regular img instead of Next Image for external URLs */}
+    return (
+      <Row className="g-4">
+        {users.map((user) => {
+          const userGameTitles = getGameTitles(user.gameInterestIds);
+          return (
+            <Col key={user.id} md={6} lg={12} xl={6}>
+              <Card
+                style={{
+                  backgroundColor: '#1a1a1a',
+                  border: '2px solid #76b900',
+                  boxShadow: '0 4px 16px rgba(118, 185, 0, 0.2)',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(118, 185, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(118, 185, 0, 0.2)';
+                }}
+              >
+                <Card.Body>
+                  <div className="d-flex align-items-start mb-3">
                     <img
-                      src={profile.profileImage || '/profile.png'}
-                      alt="Profile"
-                      width={150}
-                      height={150}
+                      src={user.profileImage || '/profile.png'}
+                      alt={user.username}
+                      width={60}
+                      height={60}
                       className="rounded-circle"
                       style={{
                         objectFit: 'cover',
-                        border: '4px solid #76b900',
-                        boxShadow: '0 0 20px rgba(118, 185, 0, 0.5)',
+                        border: '3px solid #76b900',
+                        marginRight: '1rem',
                       }}
                     />
-                  </Col>
-                  <Col xs={12} md={9}>
-                    <h2
-                      style={{
-                        color: '#76b900',
-                        fontWeight: 'bold',
-                        textShadow: '0 0 10px rgba(118, 185, 0, 0.5)',
-                      }}
-                    >
-                      {profile.username}
-                    </h2>
-                    <p style={{ color: '#b3b3b3' }} className="mb-3">
-                      {profile.email}
-                    </p>
-                    <div className="d-flex gap-4 mb-3">
-                      <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#76b900' }}>{profile.followers}</strong>
-                        {' '}
-                        <span style={{ color: '#b3b3b3' }}>Followers</span>
-                      </div>
-                      <div style={{ fontSize: '1.1rem' }}>
-                        <strong style={{ color: '#76b900' }}>{profile.following}</strong>
-                        {' '}
-                        <span style={{ color: '#b3b3b3' }}>Following</span>
+                    <div style={{ flex: 1 }}>
+                      <Card.Title
+                        className="mb-1"
+                        style={{
+                          color: '#76b900',
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {user.username}
+                      </Card.Title>
+                      <Card.Text style={{ color: '#b3b3b3', fontSize: '0.85rem' }}>
+                        {user.email}
+                      </Card.Text>
+                      <div className="d-flex gap-3 mb-2">
+                        <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
+                          <strong style={{ color: '#76b900' }}>{user.followers}</strong>
+                          {' '}
+                          Followers
+                        </span>
+                        <span style={{ color: '#b3b3b3', fontSize: '0.9rem' }}>
+                          <strong style={{ color: '#76b900' }}>{user.following}</strong>
+                          {' '}
+                          Following
+                        </span>
                       </div>
                     </div>
-                    <Link href="/profiles/edit">
+                  </div>
+
+                  {user.bio && (
+                    <Card.Text
+                      className="mb-3"
+                      style={{
+                        color: '#b3b3b3',
+                        fontSize: '0.9rem',
+                        lineHeight: '1.5',
+                      }}
+                    >
+                      {user.bio.length > 100 ? `${user.bio.substring(0, 100)}...` : user.bio}
+                    </Card.Text>
+                  )}
+
+                  {userGameTitles.length > 0 && (
+                    <div className="mb-3">
+                      <div className="d-flex flex-wrap gap-2">
+                        {userGameTitles.slice(0, 3).map((game) => (
+                          <Badge
+                            key={game}
+                            style={{
+                              background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                              color: '#0d0d0d',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                            }}
+                          >
+                            {game}
+                          </Badge>
+                        ))}
+                        {userGameTitles.length > 3 && (
+                          <Badge
+                            style={{
+                              backgroundColor: '#2d2d2d',
+                              color: '#76b900',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            +
+                            {userGameTitles.length - 3}
+                            more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {user.gameTags.length > 0 && (
+                    <div className="mb-3">
+                      <div className="d-flex flex-wrap gap-2">
+                        {user.gameTags.slice(0, 4).map((tag) => (
+                          <Badge
+                            key={tag}
+                            style={{
+                              backgroundColor: '#2d2d2d',
+                              color: '#76b900',
+                              border: '1px solid #76b900',
+                              padding: '0.3rem 0.6rem',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <Badge
+                      style={{
+                        backgroundColor: user.role === 'ADMIN' ? '#ff6b6b' : '#2d2d2d',
+                        color: user.role === 'ADMIN' ? '#fff' : '#76b900',
+                        border: user.role === 'ADMIN' ? 'none' : '1px solid #76b900',
+                        padding: '0.4rem 0.8rem',
+                      }}
+                    >
+                      {user.role}
+                    </Badge>
+
+                    <Link href={`/profiles/${user.id}`}>
                       <Button
+                        size="sm"
                         style={{
                           background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
                           border: 'none',
-                          padding: '0.5rem 1.5rem',
-                          fontWeight: '700',
                           color: '#0d0d0d',
-                          boxShadow: '0 4px 15px rgba(118, 185, 0, 0.4)',
+                          fontWeight: '600',
                         }}
                       >
-                        Edit Profile
+                        View Profile
                       </Button>
                     </Link>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
+    );
+  };
 
-        {/* About Me */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  About Me
-                </h4>
-                <p style={{ color: '#b3b3b3', lineHeight: '1.6' }}>
-                  {profile.bio || 'No bio yet. Click Edit Profile to add one!'}
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+  return (
+    <div className="user-search-landing">
+      <Container fluid className="py-5">
+        <Row>
+          <Col lg={5} xl={4} className="left-sidebar pe-lg-4">
+            <div className="text-center text-lg-start mb-5">
+              <h1 className="display-5 fw-bold">User Search</h1>
+              <p className="lead opacity-90">Find gamers across the network</p>
+            </div>
 
-        {/* Game Interests */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Game Interests
-                </h4>
-                <div className="d-flex flex-wrap gap-2">
-                  {profile.gameInterestIds.length > 0 ? (
-                    profile.gameInterestIds.map((gameId) => (
-                      <Badge
-                        key={gameId}
-                        style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          padding: '0.5rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          borderRadius: '20px',
-                          color: '#0d0d0d',
-                          boxShadow: '0 2px 10px rgba(118, 185, 0, 0.3)',
-                          border: 'none',
-                        }}
-                      >
-                        {getGameTitle(gameId)}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p style={{ color: '#666' }}>No game interests added yet</p>
-                  )}
+            <div className="search-card mb-4">
+              <InputGroup size="lg">
+                <Form.Control
+                  type="text"
+                  placeholder="Username or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress} // Now works!
+                  className="border-0 py-3 shadow-none"
+                />
+                <Button variant="success" onClick={handleSearch} disabled={loading}>
+                  {loading ? <Spinner animation="border" size="sm" /> : 'Search'}
+                </Button>
+              </InputGroup>
+            </div>
+
+            {selectedGameTitle && (
+              <div className="mb-3">
+                <Badge
+                  style={{
+                    background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                    color: '#0d0d0d',
+                    padding: '0.5rem 1rem',
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    setSelectedGameId(null);
+                    setSelectedGameTitle(null);
+                  }}
+                >
+                  {selectedGameTitle}
+                  ✕
+                </Badge>
+              </div>
+            )}
+
+            <h4 className="mb-4 game-filter-title">Filter by Game</h4>
+            <div className="game-grid-sidebar">
+              {allGames.map((game) => (
+                <div
+                  key={game.id}
+                  role="button"
+                  tabIndex={0}
+                  className={`game-card-sidebar ${selectedGameId === game.id ? 'active' : ''}`}
+                  onClick={() => handleGameClick(game)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game)}
+                >
+                  <img src={game.image} alt={game.title} />
+                  <div className="game-name-overlay">{game.title}</div>
                 </div>
-              </Card.Body>
-            </Card>
+              ))}
+            </div>
           </Col>
-        </Row>
 
-        {/* Gaming Preferences */}
-        <Row className="justify-content-center mb-4">
-          <Col md={10} lg={8}>
-            <Card
-              style={{
-                borderRadius: '15px',
-                boxShadow: '0 8px 32px rgba(118, 185, 0, 0.2)',
-                border: '1px solid #76b900',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              <Card.Body className="p-4">
-                <h4 style={{ color: '#76b900', fontWeight: 'bold', marginBottom: '1rem' }}>
-                  Gaming Preferences
-                </h4>
-                <div className="d-flex flex-wrap gap-2">
-                  {profile.gameTags.length > 0 ? (
-                    profile.gameTags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        style={{
-                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                          padding: '0.5rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          borderRadius: '20px',
-                          color: '#0d0d0d',
-                          boxShadow: '0 2px 10px rgba(118, 185, 0, 0.3)',
-                          border: 'none',
-                        }}
-                      >
-                        {tag}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p style={{ color: '#666' }}>No gaming preferences added yet</p>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
+          <Col lg={7} xl={8} className="ps-lg-5">
+            <div className="results-area">
+              <h2 className="mb-4">{getResultsTitle()}</h2>
+              {renderContent()}
+            </div>
           </Col>
         </Row>
       </Container>
-    </main>
+    </div>
   );
-};
-
-export default ProfilePage;
+}
