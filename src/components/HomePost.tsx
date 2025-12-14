@@ -14,7 +14,7 @@ type HomePostProps = {
     };
     game: {
       title: string;
-      picture: string;
+      image: string;
     };
   };
 };
