@@ -5,68 +5,57 @@ import HomeEvent from '@/components/HomeEvent';
 import HomePost from '@/components/HomePost';
 import { Col, Row } from 'react-bootstrap';
 import { EventType } from '@/types/event';
+import { PostType } from '@/types/post'; // create this type if you don't have it yet
 
 export default function HomePage() {
   // ===============================
-  // STATE FOR EVENTS
+  // STATE
   // ===============================
   const [events, setEvents] = useState<EventType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
 
   // ===============================
-  // FETCH EVENTS FROM API (NO CACHE)
+  // FETCH EVENTS
   // ===============================
   useEffect(() => {
     async function loadEvents() {
       try {
-        const res = await fetch('/api/events', {
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch events');
-        }
-
+        const res = await fetch('/api/events', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         setEvents(data);
       } catch (error) {
         console.error('Failed to load events:', error);
       } finally {
-        setLoading(false);
+        setLoadingEvents(false);
       }
     }
-
     loadEvents();
   }, []);
 
   // ===============================
-  // SAMPLE POSTS (STATIC FOR NOW)
+  // FETCH POSTS
   // ===============================
-  const samplePost = {
-    id: 1,
-    username: 'andrew123',
-    content: 'This is my first post! My favorite game is Minecraft!',
-    image: 'https://avatars.githubusercontent.com/u/229228841?v=4',
-    tags: ['minecraft', 'server', 'survival'],
-  };
-
-  const samplePost2 = {
-    id: 2,
-    username: 'FunHaverBob',
-    content: 'I love playing Valorant with friends! Anyone up for a match?',
-    image: 'https://i.etsystatic.com/49980402/r/il/a4db6e/5759608293/il_570xN.5759608293_p54b.jpg',
-    tags: ['valorant', 'LFG'],
-  };
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch('/api/posts', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch posts');
+        const data = await res.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('Failed to load posts:', error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    }
+    loadPosts();
+  }, []);
 
   return (
-    <main
-      className="page-content"
-      style={{
-        paddingTop: '120px',
-        paddingBottom: '120px',
-        position: 'relative',
-      }}
-    >
+    <main className="page-content" style={{ paddingTop: '120px', paddingBottom: '120px', position: 'relative' }}>
       {/* Background Glow */}
       <div
         style={{
@@ -94,9 +83,7 @@ export default function HomePage() {
         </h1>
 
         <Row className="g-4">
-          {/* ============================ */}
           {/* POSTS SECTION */}
-          {/* ============================ */}
           <Col md={6}>
             <div
               style={{
@@ -117,14 +104,26 @@ export default function HomePage() {
                 Browse Posts
               </h2>
 
-              <HomePost post={samplePost} />
-              <HomePost post={samplePost2} />
+              {loadingPosts && (
+                <p className="text-center" style={{ color: '#aaa' }}>
+                  Loading posts...
+                </p>
+              )}
+
+              {!loadingPosts && posts.length === 0 && (
+                <p className="text-center" style={{ color: '#aaa' }}>
+                  No posts yet.
+                </p>
+              )}
+
+              {!loadingPosts
+                && posts.map((post) => (
+                  <HomePost key={post.id} post={post} />
+                ))}
             </div>
           </Col>
 
-          {/* ============================ */}
           {/* EVENTS SECTION */}
-          {/* ============================ */}
           <Col md={6}>
             <div
               style={{
@@ -145,21 +144,20 @@ export default function HomePage() {
                 Events
               </h2>
 
-              {loading && (
+              {loadingEvents && (
                 <p className="text-center" style={{ color: '#aaa' }}>
                   Loading events...
                 </p>
               )}
 
-              {!loading && events.length === 0 && (
+              {!loadingEvents && events.length === 0 && (
                 <p className="text-center" style={{ color: '#aaa' }}>
                   No events yet.
                 </p>
               )}
 
-              {events.map((event) => (
-                <HomeEvent key={event.id} event={event} />
-              ))}
+              {!loadingEvents
+                && events.map((event) => <HomeEvent key={event.id} event={event} />)}
             </div>
           </Col>
         </Row>
