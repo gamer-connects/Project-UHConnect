@@ -7,7 +7,6 @@ import { prisma } from './prisma';
 
 /**
  * Adds a new stuff to the database.
- * @param stuff, an object with the following properties: name, quantity, owner, condition.
  */
 export async function addStuff(stuff: { name: string; quantity: number; owner: string; condition: string }) {
   let condition: Condition = 'good';
@@ -15,9 +14,10 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
     condition = 'poor';
   } else if (stuff.condition === 'excellent') {
     condition = 'excellent';
-  } else {
+  } else if (stuff.condition === 'fair') {
     condition = 'fair';
   }
+
   await prisma.stuff.create({
     data: {
       name: stuff.name,
@@ -31,7 +31,6 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
 
 /**
  * Edits an existing stuff in the database.
- * @param stuff, an object with the following properties: id, name, quantity, owner, condition.
  */
 export async function editStuff(stuff: Stuff) {
   await prisma.stuff.update({
@@ -48,7 +47,6 @@ export async function editStuff(stuff: Stuff) {
 
 /**
  * Deletes an existing stuff from the database.
- * @param id, the id of the stuff to delete.
  */
 export async function deleteStuff(id: number) {
   await prisma.stuff.delete({
@@ -59,38 +57,31 @@ export async function deleteStuff(id: number) {
 
 /**
  * Creates a new user in the database.
- * @param credentials, an object with the following properties: email, password, username.
  */
 export async function createUser(credentials: { email: string; password: string; username: string }) {
-  // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email: credentials.email },
   });
-
   if (existingUser) {
     throw new Error('User with this email already exists');
   }
 
-  // Check if username exists
   const existingUsername = await prisma.user.findUnique({
     where: { username: credentials.username },
   });
-
   if (existingUsername) {
     throw new Error('Username already taken');
   }
 
-  // Hash password
   const password = await hash(credentials.password, 10);
 
-  // Create user with all required fields
   await prisma.user.create({
     data: {
       email: credentials.email,
       password,
       username: credentials.username,
       bio: '',
-      gameInterestIds: [], // Empty array of integers
+      gameInterestIds: [],
       gameTags: [],
       followers: 0,
       following: 0,
@@ -99,30 +90,23 @@ export async function createUser(credentials: { email: string; password: string;
 }
 
 /**
- * Changes the password of an existing user in the database.
- * @param credentials, an object with the following properties: email, oldPassword, password.
+ * Changes the password of an existing user.
  */
 export async function changePassword(credentials: { email: string; oldPassword: string; password: string }) {
-  // Find the user
   const user = await prisma.user.findUnique({
     where: { email: credentials.email },
   });
-
   if (!user) {
     throw new Error('User not found');
   }
 
-  // Verify old password
   const isValidPassword = await compare(credentials.oldPassword, user.password);
-
   if (!isValidPassword) {
     throw new Error('Current password is incorrect');
   }
 
-  // Hash new password
   const newHashedPassword = await hash(credentials.password, 10);
 
-  // Update password
   await prisma.user.update({
     where: { email: credentials.email },
     data: {
@@ -132,48 +116,52 @@ export async function changePassword(credentials: { email: string; oldPassword: 
 }
 
 /**
- * Searches for users by username or email.
- * @param searchQuery, the search string.
- * @returns an array of users (without passwords).
+ * Searches for users by username/email AND optionally filters by game interest.
+ *
+ * @param searchQuery - Optional search string for username or email
+ * @param gameId - Optional game ID to filter users who have this game in their interests
+ * @returns Array of users (without password)
  */
-export async function searchUsers(searchQuery: string) {
-  if (!searchQuery.trim()) {
-    // If empty search, return all users
-    return prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        bio: true,
-        profileImage: true,
-        gameInterestIds: true, // This is Int[] in schema
-        gameTags: true,
-        followers: true,
-        following: true,
-        role: true,
-      },
-      take: 50,
-    });
-  }
+export async function searchUsers(
+  searchQuery: string = '',
+  gameId: number | null = null,
+) {
+  const whereConditions: any[] = [];
 
-  // Search by username or email
-  const users = await prisma.user.findMany({
-    where: {
+  // Text search (username or email)
+  if (searchQuery.trim()) {
+    whereConditions.push({
       OR: [
         {
           email: {
-            contains: searchQuery,
+            contains: searchQuery.trim(),
             mode: 'insensitive',
           },
         },
         {
           username: {
-            contains: searchQuery,
+            contains: searchQuery.trim(),
             mode: 'insensitive',
           },
         },
       ],
-    },
+    });
+  }
+
+  // Game filter
+  if (gameId !== null) {
+    whereConditions.push({
+      gameInterestIds: {
+        has: gameId, // Prisma magic for Int[] arrays
+      },
+    });
+  }
+
+  // Combine with AND if both filters are active
+  const where = whereConditions.length > 0 ? { AND: whereConditions } : {};
+
+  return prisma.user.findMany({
+    where,
     select: {
       id: true,
       email: true,
@@ -186,11 +174,14 @@ export async function searchUsers(searchQuery: string) {
       following: true,
       role: true,
     },
-    take: 50,
+    orderBy: { username: 'asc' },
+    take: 50, // Limit results for performance
   });
-  return users;
 }
 
+/**
+ * Gets all users with their posts (you had this at the bottom)
+ */
 export default async function getAllPosts() {
   return prisma.user.findMany({
     orderBy: { createdAt: 'desc' },

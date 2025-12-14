@@ -15,7 +15,7 @@ import {
 } from 'react-bootstrap';
 import { searchUsers } from '@/lib/dbActions';
 import Image from 'next/image';
-import Link from 'next/link'; // We'll improve the button too
+import Link from 'next/link';
 
 type User = {
   id: number;
@@ -39,7 +39,8 @@ type Game = {
 
 export default function UserSearch() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
+  const [selectedGameTitle, setSelectedGameTitle] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,7 +64,8 @@ export default function UserSearch() {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const results = await searchUsers(searchQuery);
+      // This will work once you update searchUsers in dbActions.ts
+      const results = await searchUsers(searchQuery, selectedGameId);
       setUsers(results);
     } catch (error) {
       console.error('Error searching users:', error);
@@ -72,19 +74,32 @@ export default function UserSearch() {
     }
   };
 
-  // Load all users on page load
+  // Initial load + when search query changes manually
   useEffect(() => {
     handleSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchQuery]);
 
-  const handleGameClick = (gameTitle: string) => {
-    setSelectedGame(selectedGame === gameTitle ? null : gameTitle);
-  };
+  // Auto-search when game filter changes
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedGameId]);
 
+  // Fixed: Re-add handleKeyPress
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
+    }
+  };
+
+  const handleGameClick = (game: Game) => {
+    if (selectedGameId === game.id) {
+      setSelectedGameId(null);
+      setSelectedGameTitle(null);
+    } else {
+      setSelectedGameId(game.id);
+      setSelectedGameTitle(game.title);
     }
   };
 
@@ -93,17 +108,19 @@ export default function UserSearch() {
     .filter(Boolean) as string[];
 
   const getResultsTitle = () => {
-    if (selectedGame && searchQuery) {
-      return `"${searchQuery}" in ${selectedGame}`;
+    if (selectedGameTitle && searchQuery) {
+      return `"${searchQuery}" in ${selectedGameTitle}`;
     }
-    if (selectedGame) {
-      return `Players in ${selectedGame}`;
+    if (selectedGameTitle) {
+      return `Players in ${selectedGameTitle}`;
     }
     if (searchQuery) {
       return `Results for "${searchQuery}"`;
     }
     return 'All Users';
   };
+
+  // ... renderContent remains exactly the same as yours ...
 
   const renderContent = () => {
     if (loading) {
@@ -145,7 +162,6 @@ export default function UserSearch() {
                 }}
               >
                 <Card.Body>
-                  {/* ... rest of card content unchanged ... */}
                   <div className="d-flex align-items-start mb-3">
                     <Image
                       src={user.profileImage || '/profile.png'}
@@ -296,7 +312,6 @@ export default function UserSearch() {
     <div className="user-search-landing">
       <Container fluid className="py-5">
         <Row>
-          {/* LEFT SIDEBAR */}
           <Col lg={5} xl={4} className="left-sidebar pe-lg-4">
             <div className="text-center text-lg-start mb-5">
               <h1 className="display-5 fw-bold">User Search</h1>
@@ -310,7 +325,7 @@ export default function UserSearch() {
                   placeholder="Username or email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyPress={handleKeyPress} // Now works!
                   className="border-0 py-3 shadow-none"
                 />
                 <Button variant="success" onClick={handleSearch} disabled={loading}>
@@ -319,7 +334,7 @@ export default function UserSearch() {
               </InputGroup>
             </div>
 
-            {selectedGame && (
+            {selectedGameTitle && (
               <div className="mb-3">
                 <Badge
                   style={{
@@ -329,9 +344,12 @@ export default function UserSearch() {
                     fontSize: '1rem',
                     cursor: 'pointer',
                   }}
-                  onClick={() => setSelectedGame(null)}
+                  onClick={() => {
+                    setSelectedGameId(null);
+                    setSelectedGameTitle(null);
+                  }}
                 >
-                  {selectedGame}
+                  {selectedGameTitle}
                   ✕
                 </Badge>
               </div>
@@ -344,9 +362,9 @@ export default function UserSearch() {
                   key={game.id}
                   role="button"
                   tabIndex={0}
-                  className={`game-card-sidebar ${selectedGame === game.title ? 'active' : ''}`}
-                  onClick={() => handleGameClick(game.title)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game.title)}
+                  className={`game-card-sidebar ${selectedGameId === game.id ? 'active' : ''}`}
+                  onClick={() => handleGameClick(game)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game)}
                 >
                   <img src={game.image} alt={game.title} />
                   <div className="game-name-overlay">{game.title}</div>
@@ -355,7 +373,6 @@ export default function UserSearch() {
             </div>
           </Col>
 
-          {/* RIGHT RESULTS AREA */}
           <Col lg={7} xl={8} className="ps-lg-5">
             <div className="results-area">
               <h2 className="mb-4">{getResultsTitle()}</h2>
