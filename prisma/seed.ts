@@ -6,15 +6,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  /*
-   Clear tables (FK order)
-  */
-  await prisma.post.deleteMany();
-  await prisma.event.deleteMany();
-  await prisma.eventRequest.deleteMany();
-  await prisma.stuff.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.game.deleteMany();
+  // await prisma.post.deleteMany();
+  // await prisma.event.deleteMany();
+  // await prisma.eventRequest.deleteMany();
+  // await prisma.stuff.deleteMany();
+  // await prisma.user.deleteMany();
+  // await prisma.game.deleteMany();
 
   /*
    GAMES
