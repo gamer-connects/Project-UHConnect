@@ -123,15 +123,20 @@ export async function PUT(
       updateData.gameTags = gameTags;
     }
 
-    // NEW: Profile Image
+    // NEW: Profile Image validation
     if (profileImage !== undefined) {
       if (typeof profileImage !== 'string' && profileImage !== null) {
         return NextResponse.json({ error: 'profileImage must be a string or null' }, { status: 400 });
       }
-      // Basic security: only allow our upload paths or empty/null
-      if (profileImage && !profileImage.startsWith('/uploads/profiles/')) {
-        return NextResponse.json({ error: 'Invalid profile image URL' }, { status: 400 });
+
+      // Allow Vercel Blob URLs, or empty/null
+      if (
+        profileImage &&
+        !profileImage.startsWith('https://') // All external URLs start with https
+      ) {
+        return NextResponse.json({ error: 'Invalid profile image URL format' }, { status: 400 });
       }
+
       updateData.profileImage = profileImage || null;
     }
 
