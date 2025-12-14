@@ -15,19 +15,7 @@ import {
 } from 'react-bootstrap';
 import { searchUsers } from '@/lib/dbActions';
 import Image from 'next/image';
-
-const games = [
-  { name: 'Valorant', cover: '/covers/valorant.jpg' },
-  { name: 'League of Legends', cover: '/covers/lol.jpg' },
-  { name: 'Fortnite', cover: '/covers/fortnite.jpg' },
-  { name: 'Overwatch 2', cover: '/covers/overwatch.jpg' },
-  { name: 'Minecraft', cover: '/covers/minecraft.jpg' },
-  { name: 'Apex Legends', cover: '/covers/apex.jpg' },
-  { name: 'CS2', cover: '/covers/cs2.jpg' },
-  { name: 'Genshin Impact', cover: '/covers/genshin.jpg' },
-  { name: 'Rocket League', cover: '/covers/rocketleague.jpg' },
-  { name: 'Dota 2', cover: '/covers/dota2.jpg' },
-] as const;
+import Link from 'next/link'; // We'll improve the button too
 
 type User = {
   id: number;
@@ -35,7 +23,7 @@ type User = {
   username: string;
   bio: string | null;
   profileImage: string | null;
-  gameInterestIds: number[]; // Changed from string[] to number[]
+  gameInterestIds: number[];
   gameTags: string[];
   followers: number;
   following: number;
@@ -62,7 +50,7 @@ export default function UserSearch() {
       try {
         const response = await fetch('/api/games');
         if (response.ok) {
-          const gamesData = await response.json();
+          const gamesData: Game[] = await response.json();
           setAllGames(gamesData);
         }
       } catch (error) {
@@ -72,7 +60,6 @@ export default function UserSearch() {
     fetchGames();
   }, []);
 
-  // Define handleSearch before using it
   const handleSearch = async () => {
     setLoading(true);
     try {
@@ -91,8 +78,8 @@ export default function UserSearch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleGameClick = (gameName: string) => {
-    setSelectedGame(selectedGame === gameName ? null : gameName);
+  const handleGameClick = (gameTitle: string) => {
+    setSelectedGame(selectedGame === gameTitle ? null : gameTitle);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -101,12 +88,10 @@ export default function UserSearch() {
     }
   };
 
-  // Get game titles from IDs
   const getGameTitles = (gameIds: number[]): string[] => gameIds
-    .map(id => allGames.find(game => game.id === id)?.title)
+    .map((id) => allGames.find((game) => game.id === id)?.title)
     .filter(Boolean) as string[];
 
-  // Helper function to get the results title
   const getResultsTitle = () => {
     if (selectedGame && searchQuery) {
       return `"${searchQuery}" in ${selectedGame}`;
@@ -120,7 +105,6 @@ export default function UserSearch() {
     return 'All Users';
   };
 
-  // Render content based on state
   const renderContent = () => {
     if (loading) {
       return (
@@ -130,13 +114,10 @@ export default function UserSearch() {
         </div>
       );
     }
-
     if (users.length === 0) {
       return (
         <div className="text-center mt-5">
-          <p className="lead" style={{ color: '#b3b3b3' }}>
-            No users found
-          </p>
+          <p className="lead" style={{ color: '#b3b3b3' }}>No users found</p>
         </div>
       );
     }
@@ -164,6 +145,7 @@ export default function UserSearch() {
                 }}
               >
                 <Card.Body>
+                  {/* ... rest of card content unchanged ... */}
                   <div className="d-flex align-items-start mb-3">
                     <Image
                       src={user.profileImage || '/profile.png'}
@@ -247,7 +229,6 @@ export default function UserSearch() {
                           >
                             +
                             {userGameTitles.length - 3}
-                            {' '}
                             more
                           </Badge>
                         )}
@@ -287,18 +268,20 @@ export default function UserSearch() {
                     >
                       {user.role}
                     </Badge>
-                    <Button
-                      size="sm"
-                      style={{
-                        background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
-                        border: 'none',
-                        color: '#0d0d0d',
-                        fontWeight: '600',
-                      }}
-                      onClick={() => window.location.href = `/profiles/${user.id}`}
-                    >
-                      View Profile
-                    </Button>
+
+                    <Link href={`/profiles/${user.id}`}>
+                      <Button
+                        size="sm"
+                        style={{
+                          background: 'linear-gradient(135deg, #76b900 0%, #39ff14 100%)',
+                          border: 'none',
+                          color: '#0d0d0d',
+                          fontWeight: '600',
+                        }}
+                      >
+                        View Profile
+                      </Button>
+                    </Link>
                   </div>
                 </Card.Body>
               </Card>
@@ -313,15 +296,13 @@ export default function UserSearch() {
     <div className="user-search-landing">
       <Container fluid className="py-5">
         <Row>
-          {/* ─────── LEFT SIDEBAR ─────── */}
+          {/* LEFT SIDEBAR */}
           <Col lg={5} xl={4} className="left-sidebar pe-lg-4">
-            {/* Hero */}
             <div className="text-center text-lg-start mb-5">
               <h1 className="display-5 fw-bold">User Search</h1>
               <p className="lead opacity-90">Find gamers across the network</p>
             </div>
 
-            {/* Search Bar */}
             <div className="search-card mb-4">
               <InputGroup size="lg">
                 <Form.Control
@@ -332,11 +313,7 @@ export default function UserSearch() {
                   onKeyPress={handleKeyPress}
                   className="border-0 py-3 shadow-none"
                 />
-                <Button
-                  variant="success"
-                  onClick={handleSearch}
-                  disabled={loading}
-                >
+                <Button variant="success" onClick={handleSearch} disabled={loading}>
                   {loading ? <Spinner animation="border" size="sm" /> : 'Search'}
                 </Button>
               </InputGroup>
@@ -355,38 +332,33 @@ export default function UserSearch() {
                   onClick={() => setSelectedGame(null)}
                 >
                   {selectedGame}
-                  {' '}
                   ✕
                 </Badge>
               </div>
             )}
 
-            {/* Game Filter Grid */}
             <h4 className="mb-4 game-filter-title">Filter by Game</h4>
             <div className="game-grid-sidebar">
-              {games.map((game) => (
+              {allGames.map((game) => (
                 <div
-                  key={game.name}
+                  key={game.id}
                   role="button"
                   tabIndex={0}
-                  className={`game-card-sidebar ${selectedGame === game.name ? 'active' : ''}`}
-                  onClick={() => handleGameClick(game.name)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game.name)}
+                  className={`game-card-sidebar ${selectedGame === game.title ? 'active' : ''}`}
+                  onClick={() => handleGameClick(game.title)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleGameClick(game.title)}
                 >
-                  <img src={game.cover} alt={game.name} />
-                  <div className="game-name-overlay">{game.name}</div>
+                  <img src={game.image} alt={game.title} />
+                  <div className="game-name-overlay">{game.title}</div>
                 </div>
               ))}
             </div>
           </Col>
 
-          {/* ─────── RIGHT RESULTS AREA ─────── */}
+          {/* RIGHT RESULTS AREA */}
           <Col lg={7} xl={8} className="ps-lg-5">
             <div className="results-area">
-              <h2 className="mb-4">
-                {getResultsTitle()}
-              </h2>
-
+              <h2 className="mb-4">{getResultsTitle()}</h2>
               {renderContent()}
             </div>
           </Col>
