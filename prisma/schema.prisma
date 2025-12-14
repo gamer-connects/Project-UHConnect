@@ -23,6 +23,10 @@ model User {
   username        String   @unique
   gameInterestIds Int[]
   posts           Post[]
+
+  // Relations
+  followersRel   Follow[] @relation("UserFollowers")
+  followingRel   Follow[] @relation("UserFollowing")
 }
 
 model Stuff {
@@ -103,4 +107,18 @@ enum RequestStatus {
   APPROVED
   REJECTED
   IN_REVIEW
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  follower    User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }
