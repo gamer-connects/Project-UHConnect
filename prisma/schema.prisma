@@ -48,7 +48,7 @@ model EventRequest {
   location         String?
   additionalNotes  String?
   eventPoster      String?
-  status           RequestStatus @default(PENDING)
+  status           RequestStatus @default(UNOPENED)
   adminNotes       String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -103,4 +103,7 @@ enum RequestStatus {
   APPROVED
   REJECTED
   IN_REVIEW
+  UNOPENED
+  LIVE
+  CLOSED
 }
